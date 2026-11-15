@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BookOpenText, Check, PlayCircle, ScanEye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import heroImg from "@/assets/hero-sprinter.jpg";
-import analysisImg from "@/assets/analysis-athlete.jpg";
+import heroImg from "@/assets/photos/basketball-arena-hero.jpg.asset.json";
+import trainingCourtImg from "@/assets/photos/indoor-training-court.jpg.asset.json";
+import gameCourtImg from "@/assets/photos/basketball-game-court.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const sports = ["Sprinting", "Basketball", "Soccer", "Tennis", "Swimming", "Strength", "Football", "Jumps"];
+const sports = ["Basketball", "Sprinting", "Soccer", "Tennis", "Swimming", "Strength", "Football", "Volleyball"];
 
 const pillars = [
   {
@@ -52,11 +53,11 @@ function Landing() {
       {/* HERO */}
       <section className="relative isolate overflow-hidden">
         <img
-          src={heroImg}
-          alt="Sprinter driving out of the starting blocks at night"
-          width={1920}
-          height={1088}
-          className="absolute inset-0 -z-20 h-full w-full object-cover object-[70%_center]"
+          src={heroImg.url}
+          alt="Basketball player standing on an indoor arena court under the lights"
+          width={2400}
+          height={1600}
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-[60%_30%]"
         />
         <div className="absolute inset-0 -z-10 bg-fade-left" />
         <div className="absolute inset-0 -z-10 bg-fade-up" />
@@ -149,17 +150,17 @@ function Landing() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-24 md:grid-cols-2 md:px-8">
           <div className="relative overflow-hidden rounded-2xl border border-border">
             <img
-              src={analysisImg}
-              alt="Athlete reviewing training footage on a tablet"
-              width={1280}
-              height={960}
+              src={trainingCourtImg.url}
+              alt="Two players running a dribbling drill in an indoor training gym"
+              width={1800}
+              height={1390}
               loading="lazy"
               className="aspect-[4/3] w-full object-cover"
             />
             <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-border bg-background/80 p-4 backdrop-blur-md">
-              <p className="eyebrow">Sample feedback · Sprint acceleration</p>
+              <p className="eyebrow">Sample feedback · Jump shot</p>
               <p className="mt-2 text-sm">
-                “You pop upright by step three. Hold a straight line from ankle to head and push the ground back — try 4×15 m falling starts.”
+                “Your elbow flares out on the lift and you release on the way down. Keep the elbow under the ball and let it go at the top — try 50 one-hand form shots.”
               </p>
             </div>
           </div>
@@ -187,11 +188,19 @@ function Landing() {
 
       {/* CTA */}
       <section className="mx-auto max-w-7xl px-5 py-24 md:px-8 md:py-32">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-volt p-10 text-primary-foreground md:p-16">
-          <div className="absolute inset-0 stripe-volt opacity-40" />
+        <div className="relative isolate overflow-hidden rounded-3xl border border-border p-10 md:p-16">
+          <img
+            src={gameCourtImg.url}
+            alt=""
+            width={2000}
+            height={1334}
+            loading="lazy"
+            className="absolute inset-0 -z-20 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 -z-10 bg-tint" />
           <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <h2 className="text-display max-w-2xl text-5xl md:text-7xl">Your next PR starts with the next rep.</h2>
-            <Button asChild size="xl" variant="secondary" className="uppercase tracking-wider">
+            <Button asChild size="xl" variant="hero">
               <Link to="/auth" search={{ mode: "signup" }}>
                 Become a member <ArrowRight />
               </Link>

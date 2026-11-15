@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2, MailCheck } from "lucide-react";
@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { LEVELS, SPORTS } from "@/lib/sports";
-import heroImg from "@/assets/hero-sprinter.jpg";
+import sideImg from "@/assets/photos/basketball-shooting-form.jpg.asset.json";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -85,7 +85,7 @@ function AuthPage() {
     setErrors({});
 
     if (mode === "forgot") {
-      const parsed = z.string().trim().email().safeParse(raw.email);
+      const parsed = z.string().trim().email().safeParse(raw["email"]);
       if (!parsed.success) return setErrors({ email: "Enter a valid email" });
       setLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
@@ -140,7 +140,7 @@ function AuthPage() {
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
-        <img src={heroImg} alt="" width={1920} height={1088} className="absolute inset-0 h-full w-full object-cover object-[75%_center]" />
+        <img src={sideImg.url} alt="Basketball player practicing his shooting form on an indoor court" width={1400} height={2100} className="absolute inset-0 h-full w-full object-cover object-top" />
         <div className="absolute inset-0 bg-fade-up" />
         <div className="absolute bottom-12 left-12 right-12">
           <p className="eyebrow">Members train with intent</p>
@@ -196,11 +196,11 @@ function AuthPage() {
               <form onSubmit={onSubmit} className={mode === "forgot" ? "mt-8 space-y-5" : "space-y-5"} noValidate>
                 {mode === "signup" && (
                   <>
-                    <Field label="Full name" error={errors.displayName}>
+                    <Field label="Full name" error={errors["displayName"]}>
                       <Input name="displayName" autoComplete="name" placeholder="Jordan Ellis" maxLength={80} />
                     </Field>
                     <div className="grid grid-cols-2 gap-4">
-                      <Field label="Primary sport" error={errors.sport}>
+                      <Field label="Primary sport" error={errors["sport"]}>
                         <Select value={sport} onValueChange={setSport}>
                           <SelectTrigger aria-label="Primary sport"><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>
@@ -208,7 +208,7 @@ function AuthPage() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Level" error={errors.level}>
+                      <Field label="Level" error={errors["level"]}>
                         <Select value={level} onValueChange={setLevel}>
                           <SelectTrigger aria-label="Level"><SelectValue placeholder="Select" /></SelectTrigger>
                           <SelectContent>
@@ -219,13 +219,13 @@ function AuthPage() {
                     </div>
                   </>
                 )}
-                <Field label="Email" error={errors.email}>
+                <Field label="Email" error={errors["email"]}>
                   <Input name="email" type="email" autoComplete="email" placeholder="you@example.com" maxLength={255} />
                 </Field>
                 {mode !== "forgot" && (
                   <Field
                     label="Password"
-                    error={errors.password}
+                    error={errors["password"]}
                     action={
                       mode === "signin" ? (
                         <button type="button" onClick={() => setMode("forgot")} className="text-xs font-semibold text-primary hover:underline">
@@ -268,7 +268,7 @@ function AuthPage() {
   );
 }
 
-function Field({ label, error, action, children }: { label: string; error?: string; action?: React.ReactNode; children: React.ReactNode }) {
+function Field({ label, error, action, children }: { label: string; error?: string | undefined; action?: ReactNode; children: ReactNode }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">

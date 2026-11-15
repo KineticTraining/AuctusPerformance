@@ -6,5 +6,6 @@
 - [ ] Sports science articles list + article page
 - [ ] Video submission page with AI technique analysis
 - [ ] Switch color scheme from volt yellow/black to blue
-- [ ] Replace AI-generated photos with real free-license photos (natural skin tones)
+- [ ] Replace AI-generated photos with high-res Unsplash photos: real basketball players + indoor training facilities (natural skin tones)
+- [ ] Enable Stripe payments for memberships (BLOCKED: built-in Stripe needs Pro plan — waiting on user: upgrade or own Stripe key)
 - [ ] Verify end-to-end (sign up, dashboard, submit + AI review)
