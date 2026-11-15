@@ -18,8 +18,8 @@ import sideImg from "@/assets/photos/basketball-shooting-form.jpg.asset.json";
 type Mode = "signin" | "signup" | "forgot";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>): { mode?: Mode } => ({
-    mode: s.mode === "signup" || s.mode === "forgot" ? s.mode : undefined,
+  validateSearch: (s: Record<string, unknown>): { mode?: Mode | undefined } => ({
+    mode: s["mode"] === "signup" || s["mode"] === "forgot" ? s["mode"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -133,6 +133,7 @@ function AuthPage() {
     if (result.error) return toast.error("Sign-in didn't complete. Please try again.");
     if (result.redirected) return;
     navigate({ to: "/dashboard" });
+    return;
   }
 
   const title = mode === "signup" ? "Join the lab" : mode === "forgot" ? "Reset password" : "Welcome back";

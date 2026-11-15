@@ -65,7 +65,7 @@ export function SiteHeader() {
                 <Button variant="glass" size="sm" className="gap-2">
                   <User />
                   <span className="hidden max-w-[10rem] truncate sm:inline">
-                    {session.user.user_metadata?.display_name ?? session.user.email}
+                    {session.user.user_metadata?.["display_name"] ?? session.user.email}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
