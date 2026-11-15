@@ -1,23 +1,204 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, BookOpenText, Check, PlayCircle, ScanEye } from "lucide-react";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { Button } from "@/components/ui/button";
+import heroImg from "@/assets/hero-sprinter.jpg";
+import analysisImg from "@/assets/analysis-athlete.jpg";
+
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Kinetic — Train Smarter. Move Faster." },
+      {
+        name: "description",
+        content:
+          "Join Kinetic: a training membership with coach-led video library, sports science articles and AI technique review of your own footage.",
+      },
+      { property: "og:title", content: "Kinetic — Train Smarter. Move Faster." },
+      {
+        property: "og:description",
+        content: "Coach-led video library, sports science and AI technique review for serious athletes.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Landing,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const sports = ["Sprinting", "Basketball", "Soccer", "Tennis", "Swimming", "Strength", "Football", "Jumps"];
+
+const pillars = [
+  {
+    icon: PlayCircle,
+    title: "Video Library",
+    body: "Strength, speed, mobility, sport skills and mindset — organized into training sections you can follow session by session.",
+  },
+  {
+    icon: BookOpenText,
+    title: "Sports Science",
+    body: "Plain-language breakdowns of the research on sleep, load, power and recovery, written by practitioners.",
+  },
+  {
+    icon: ScanEye,
+    title: "AI Technique Review",
+    body: "Submit a video link and notes. Our AI watches your rep and compares it to a database of coaching cues and common faults.",
+  },
+];
+
+function Landing() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div>
+      {/* HERO */}
+      <section className="relative isolate overflow-hidden">
+        <img
+          src={heroImg}
+          alt="Sprinter driving out of the starting blocks at night"
+          width={1920}
+          height={1088}
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-[70%_center]"
+        />
+        <div className="absolute inset-0 -z-10 bg-fade-left" />
+        <div className="absolute inset-0 -z-10 bg-fade-up" />
+        <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col justify-end px-5 pb-20 pt-32 md:px-8 md:pb-28">
+          <p className="eyebrow animate-rise">Sports training membership</p>
+          <h1 className="text-display mt-5 max-w-4xl animate-rise text-6xl [animation-delay:80ms] sm:text-7xl md:text-8xl lg:text-[8.5rem]">
+            Train smarter.
+            <br />
+            <span className="text-gradient-volt">Move faster.</span>
+          </h1>
+          <p className="mt-6 max-w-xl animate-rise text-lg text-muted-foreground [animation-delay:160ms]">
+            Coach-built programs, the science behind them, and AI feedback on your own technique — all in one membership.
+          </p>
+          <div className="mt-10 flex animate-rise flex-wrap gap-3 [animation-delay:240ms]">
+            <Button asChild variant="hero" size="xl">
+              <Link to="/auth" search={{ mode: "signup" }}>
+                Start training <ArrowRight />
+              </Link>
+            </Button>
+            <Button asChild variant="glass" size="xl">
+              <Link to="/articles">Read the science</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* MARQUEE */}
+      <div className="overflow-hidden border-y border-border/60 bg-surface py-5">
+        <div className="flex w-max animate-marquee gap-12">
+          {[...sports, ...sports].map((s, i) => (
+            <span key={i} className="text-display flex items-center gap-12 text-3xl text-muted-foreground/60">
+              {s} <span className="size-2 rotate-45 bg-primary" />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* MISSION */}
+      <section className="relative bg-grid">
+        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-24 md:grid-cols-[1fr_1.2fr] md:px-8 md:py-32">
+          <div>
+            <p className="eyebrow">Our mission</p>
+            <h2 className="text-display mt-4 text-5xl md:text-6xl">
+              Elite coaching shouldn't be reserved for the elite.
+            </h2>
+          </div>
+          <div className="space-y-6 text-lg leading-relaxed text-muted-foreground">
+            <p>
+              Most athletes train hard. Far fewer train with a plan grounded in evidence, or get honest feedback on how they actually move.
+            </p>
+            <p>
+              Kinetic brings together the coaching content, the sports science and the technique review that used to require a pro
+              program — so a high-school sprinter, a weekend tennis player and a college hooper can all train with intent.
+            </p>
+            <ul className="grid gap-3 pt-2 text-base text-foreground sm:grid-cols-2">
+              {["Evidence before trends", "Technique before load", "Feedback every week", "Built for every level"].map((t) => (
+                <li key={t} className="flex items-center gap-3">
+                  <span className="grid size-6 place-items-center rounded-full bg-primary/15 text-primary">
+                    <Check className="size-3.5" />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* PILLARS */}
+      <section className="mx-auto max-w-7xl px-5 pb-24 md:px-8 md:pb-32">
+        <div className="grid gap-5 md:grid-cols-3">
+          {pillars.map(({ icon: Icon, title, body }, i) => (
+            <article
+              key={title}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-card p-8 shadow-card transition-transform hover:-translate-y-1"
+            >
+              <span className="text-display absolute right-6 top-4 text-7xl text-foreground/5">0{i + 1}</span>
+              <span className="grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground">
+                <Icon className="size-6" />
+              </span>
+              <h3 className="text-display mt-8 text-3xl">{title}</h3>
+              <p className="mt-3 text-muted-foreground">{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* AI REVIEW */}
+      <section className="border-y border-border/60 bg-surface">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-24 md:grid-cols-2 md:px-8">
+          <div className="relative overflow-hidden rounded-2xl border border-border">
+            <img
+              src={analysisImg}
+              alt="Athlete reviewing training footage on a tablet"
+              width={1280}
+              height={960}
+              loading="lazy"
+              className="aspect-[4/3] w-full object-cover"
+            />
+            <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-border bg-background/80 p-4 backdrop-blur-md">
+              <p className="eyebrow">Sample feedback · Sprint acceleration</p>
+              <p className="mt-2 text-sm">
+                “You pop upright by step three. Hold a straight line from ankle to head and push the ground back — try 4×15 m falling starts.”
+              </p>
+            </div>
+          </div>
+          <div>
+            <p className="eyebrow">How video review works</p>
+            <h2 className="text-display mt-4 text-5xl md:text-6xl">Your rep, measured against the cues that matter.</h2>
+            <ol className="mt-10 space-y-6">
+              {[
+                ["Share a link", "Paste a YouTube link to your rep and pick the technique you're working on."],
+                ["Add context", "Tell us what you feel, what your coach says, and what you want fixed."],
+                ["Get your breakdown", "AI watches the clip against our technique database and returns strengths, faults, cues and drills."],
+              ].map(([t, b], i) => (
+                <li key={t} className="flex gap-5">
+                  <span className="text-display text-4xl text-primary">0{i + 1}</span>
+                  <div>
+                    <h3 className="text-xl font-bold not-italic [font-family:var(--font-sans)]">{t}</h3>
+                    <p className="mt-1 text-muted-foreground">{b}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mx-auto max-w-7xl px-5 py-24 md:px-8 md:py-32">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-volt p-10 text-primary-foreground md:p-16">
+          <div className="absolute inset-0 stripe-volt opacity-40" />
+          <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <h2 className="text-display max-w-2xl text-5xl md:text-7xl">Your next PR starts with the next rep.</h2>
+            <Button asChild size="xl" variant="secondary" className="uppercase tracking-wider">
+              <Link to="/auth" search={{ mode: "signup" }}>
+                Become a member <ArrowRight />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
