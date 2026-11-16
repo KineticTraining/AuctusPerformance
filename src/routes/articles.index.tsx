@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowUpRight, Clock } from "lucide-react";
 import { useState } from "react";
 
+import { SportFilter } from "@/components/site/sport-filter";
 import { articlesQuery } from "@/lib/articles.functions";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -29,8 +30,12 @@ function ArticlesPage() {
   const { data: articles } = useSuspenseQuery(articlesQuery());
   const categories = ["All", ...Array.from(new Set(articles.map((a) => a.category)))];
   const [cat, setCat] = useState("All");
+  const [sportFilters, setSportFilters] = useState<string[]>([]);
   const featured = articles.find((a) => a.featured) ?? articles[0];
-  const rest = articles.filter((a) => a.slug !== featured?.slug && (cat === "All" || a.category === cat));
+  const isFiltered = cat !== "All" || sportFilters.length > 0;
+  const matches = (a: (typeof articles)[number]) =>
+    (cat === "All" || a.category === cat) && (sportFilters.length === 0 || a.sports.some((s) => sportFilters.includes(s)));
+  const gridArticles = articles.filter((a) => matches(a) && (isFiltered || a.slug !== featured?.slug));
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
@@ -40,7 +45,7 @@ function ArticlesPage() {
         The research behind better training — translated into what to actually do on Monday.
       </p>
 
-      {featured && cat === "All" && (
+      {featured && !isFiltered && (
         <Link
           to="/articles/$slug"
           params={{ slug: featured.slug }}
@@ -75,8 +80,15 @@ function ArticlesPage() {
         ))}
       </div>
 
+      <div className="mt-6">
+        <SportFilter selected={sportFilters} onChange={setSportFilters} />
+      </div>
+
       <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {(cat === "All" ? rest : articles.filter((a) => a.category === cat)).map((a) => (
+        {gridArticles.length === 0 && (
+          <p className="text-sm text-muted-foreground md:col-span-2 lg:col-span-3">No articles match these filters yet.</p>
+        )}
+        {gridArticles.map((a) => (
           <Link
             key={a.slug}
             to="/articles/$slug"

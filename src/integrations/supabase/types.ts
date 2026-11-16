@@ -26,6 +26,7 @@ export type Database = {
           published_at: string
           read_minutes: number
           slug: string
+          sports: string[]
           title: string
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           published_at?: string
           read_minutes?: number
           slug: string
+          sports?: string[]
           title: string
         }
         Update: {
@@ -52,6 +54,7 @@ export type Database = {
           published_at?: string
           read_minutes?: number
           slug?: string
+          sports?: string[]
           title?: string
         }
         Relationships: []
@@ -174,6 +177,7 @@ export type Database = {
           section: string
           sort_order: number
           sport: string
+          sports: string[]
           title: string
           youtube_id: string
         }
@@ -187,6 +191,7 @@ export type Database = {
           section: string
           sort_order?: number
           sport?: string
+          sports?: string[]
           title: string
           youtube_id: string
         }
@@ -200,6 +205,7 @@ export type Database = {
           section?: string
           sort_order?: number
           sport?: string
+          sports?: string[]
           title?: string
           youtube_id?: string
         }

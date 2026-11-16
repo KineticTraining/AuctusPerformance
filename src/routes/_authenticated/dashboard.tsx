@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { SportFilter } from "@/components/site/sport-filter";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +45,10 @@ function Dashboard() {
   const { data } = useSuspenseQuery(dashboardQuery());
   const [section, setSection] = useState(SECTIONS[0]!);
   const [playing, setPlaying] = useState<{ youtube_id: string; title: string } | null>(null);
-  const videos = data.videos.filter((v) => v.section === section);
+  const [sportFilters, setSportFilters] = useState<string[]>([]);
+  const videos = data.videos.filter(
+    (v) => v.section === section && (sportFilters.length === 0 || v.sports.some((s) => sportFilters.includes(s))),
+  );
   const name = data.profile?.display_name?.split(" ")[0] || "Athlete";
 
   return (
@@ -87,6 +91,12 @@ function Dashboard() {
           </button>
         ))}
       </div>
+      <div className="mt-6">
+        <SportFilter selected={sportFilters} onChange={setSportFilters} />
+      </div>
+      {videos.length === 0 && (
+        <p className="mt-10 text-sm text-muted-foreground">No videos match these filters in this section yet.</p>
+      )}
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((v) => (
           <button key={v.id} onClick={() => setPlaying(v)} className="group overflow-hidden rounded-2xl border border-border bg-surface text-left transition-colors hover:border-foreground/30">

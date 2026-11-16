@@ -10,6 +10,7 @@ export type ArticleSummary = {
   author: string;
   author_role: string;
   read_minutes: number;
+  sports: string[];
   featured: boolean;
   published_at: string;
 };
@@ -20,7 +21,7 @@ export const listArticles = createServerFn({ method: "GET" }).handler(async (): 
   const { createPublicSupabase } = await import("./public-supabase.server");
   const { data, error } = await createPublicSupabase()
     .from("articles")
-    .select("slug, title, excerpt, category, author, author_role, read_minutes, featured, published_at")
+    .select("slug, title, excerpt, category, author, author_role, read_minutes, featured, published_at, sports")
     .order("published_at", { ascending: false });
   if (error) throw new Error("Could not load articles");
   return data ?? [];
@@ -32,7 +33,7 @@ export const getArticle = createServerFn({ method: "GET" })
     const { createPublicSupabase } = await import("./public-supabase.server");
     const { data: row, error } = await createPublicSupabase()
       .from("articles")
-      .select("slug, title, excerpt, body, category, author, author_role, read_minutes, featured, published_at")
+      .select("slug, title, excerpt, body, category, author, author_role, read_minutes, featured, published_at, sports")
       .eq("slug", data.slug)
       .maybeSingle();
     if (error) throw new Error("Could not load article");

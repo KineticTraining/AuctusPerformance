@@ -88,11 +88,11 @@ function Landing() {
       </section>
 
       {/* MARQUEE */}
-      <div className="overflow-hidden border-y border-border/60 bg-surface py-5">
-        <div className="flex w-max animate-marquee gap-12">
+      <div className="overflow-hidden border-y border-border/60 bg-surface py-6">
+        <div className="flex w-max animate-marquee gap-14">
           {[...sports, ...sports].map((s, i) => (
-            <span key={i} className="eyebrow flex items-center gap-12 text-sm text-muted-foreground">
-              {s} <span className={`size-1.5 rounded-full ${i % 2 ? "bg-brand-blue" : "bg-brand-red"}`} />
+            <span key={i} className="flex items-center whitespace-nowrap font-sans text-lg font-semibold uppercase tracking-wide text-foreground">
+              {s}
             </span>
           ))}
         </div>
