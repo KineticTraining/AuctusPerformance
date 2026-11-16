@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "./logo";
 
 const navLinkClass =
-  "text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-foreground";
+  "text-sm font-normal text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-foreground";
 
 export function SiteHeader() {
   const { session, ready } = useAuth();

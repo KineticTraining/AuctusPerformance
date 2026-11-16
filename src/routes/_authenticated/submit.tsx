@@ -74,13 +74,19 @@ function SubmitPage() {
     e.preventDefault();
     const form = e.currentTarget;
     const parsed = formSchema.safeParse(Object.fromEntries(new FormData(form).entries()));
-    if (!parsed.success) return toast.error(parsed.error.issues[0]?.message ?? "Check the form");
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Check the form");
+      return;
+    }
     const { data: row, error } = await supabase
       .from("submissions")
       .insert({ ...parsed.data, technique_id: techniqueId || null })
       .select("id")
       .single();
-    if (error || !row) return toast.error("Couldn't save your submission");
+    if (error || !row) {
+      toast.error("Couldn't save your submission");
+      return;
+    }
     form.reset();
     setTechniqueId("");
     await queryClient.invalidateQueries({ queryKey: ["submissions"] });
@@ -124,12 +130,12 @@ function SubmitPage() {
             <article key={s.id} className="rounded-2xl border border-border bg-surface p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-bold">{s.title}</h3>
+                  <h3 className="text-lg font-normal">{s.title}</h3>
                   <p className="text-xs text-muted-foreground">
                     {s.technique ? `${s.technique.sport} — ${s.technique.name} · ` : ""}{formatDate(s.created_at)}
                   </p>
                 </div>
-                {a.success && <span className="text-display text-4xl text-primary">{a.data.overall_score}/10</span>}
+                {a.success && <span className="text-display text-4xl font-extralight text-brand-blue">{a.data.overall_score}/10</span>}
               </div>
               {running && <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" /> AI is reviewing your rep…</p>}
               {!running && s.status !== "complete" && (
@@ -147,9 +153,9 @@ function SubmitPage() {
                   )}
                   {a.data.improvements.map((imp, i) => (
                     <div key={i} className="rounded-xl border border-border bg-background/50 p-4">
-                      <p className="font-semibold">{imp.issue}</p>
-                      <p className="mt-1 text-muted-foreground"><span className="text-primary">Cue:</span> {imp.cue}</p>
-                      <p className="mt-1 text-muted-foreground"><span className="text-primary">Drill:</span> {imp.drill}</p>
+                      <p className="font-medium">{imp.issue}</p>
+                      <p className="mt-1 text-muted-foreground"><span className="text-brand-red">Cue:</span> {imp.cue}</p>
+                      <p className="mt-1 text-muted-foreground"><span className="text-brand-blue">Drill:</span> {imp.drill}</p>
                     </div>
                   ))}
                   <p><span className="eyebrow">Next session</span><br />{a.data.next_session}</p>

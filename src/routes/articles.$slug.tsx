@@ -43,7 +43,7 @@ function ArticlePage() {
 
   return (
     <article className="mx-auto max-w-3xl px-5 py-16 md:py-24">
-      <Link to="/articles" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+      <Link to="/articles" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> All articles
       </Link>
       <p className="eyebrow mt-10">{a.category}</p>
@@ -51,7 +51,7 @@ function ArticlePage() {
       <p className="mt-6 text-xl text-muted-foreground">{a.excerpt}</p>
       <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 border-y border-border py-4 text-sm text-muted-foreground">
         <span>
-          <span className="font-semibold text-foreground">{a.author}</span> · {a.author_role}
+          <span className="font-medium text-foreground">{a.author}</span> · {a.author_role}
         </span>
         <span>{formatDate(a.published_at)}</span>
         <span className="flex items-center gap-1">
@@ -60,14 +60,14 @@ function ArticlePage() {
       </div>
       <div className="mt-10 space-y-6 text-lg leading-relaxed text-foreground/85">
         {blocks.map((b, i) => {
-          if (b.startsWith("## ")) return <h2 key={i} className="text-display pt-6 text-3xl text-foreground">{b.slice(3)}</h2>;
+          if (b.startsWith("## ")) return <h2 key={i} className="text-display pt-6 text-2xl text-foreground">{b.slice(3)}</h2>;
           const lines = b.split("\n");
           if (lines.every((l) => l.startsWith("- "))) {
             return (
               <ul key={i} className="space-y-3">
                 {lines.map((l, j) => (
                   <li key={j} className="flex gap-3">
-                    <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand-red" />
                     <span>{l.slice(2)}</span>
                   </li>
                 ))}
@@ -77,8 +77,8 @@ function ArticlePage() {
           return <p key={i}>{b}</p>;
         })}
       </div>
-      <div className="mt-16 rounded-2xl border border-primary/30 bg-primary/10 p-8">
-        <p className="text-display text-3xl">Put it into practice</p>
+      <div className="mt-16 rounded-2xl border border-border bg-surface p-8">
+        <p className="text-display text-2xl">Put it into practice</p>
         <p className="mt-2 text-muted-foreground">Members get follow-along sessions and AI feedback on their technique.</p>
         <Button asChild variant="hero" className="mt-6">
           <Link to="/dashboard">Go to your training</Link>

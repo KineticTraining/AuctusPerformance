@@ -47,6 +47,8 @@ const pillars = [
   },
 ];
 
+const pillarTone = ["bg-brand-red text-foreground", "bg-foreground text-background", "bg-brand-blue text-foreground"];
+
 function Landing() {
   return (
     <div>
@@ -57,18 +59,19 @@ function Landing() {
           alt="Basketball player standing on an indoor arena court under the lights"
           width={2400}
           height={1600}
-          className="absolute inset-0 -z-20 h-full w-full object-cover object-[60%_30%]"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-[60%_30%] saturate-[1.15]"
         />
         <div className="absolute inset-0 -z-10 bg-fade-left" />
         <div className="absolute inset-0 -z-10 bg-fade-up" />
         <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col justify-end px-5 pb-20 pt-32 md:px-8 md:pb-28">
-          <p className="eyebrow animate-rise">Sports training membership</p>
-          <h1 className="text-display mt-5 max-w-4xl animate-rise text-6xl [animation-delay:80ms] sm:text-7xl md:text-8xl lg:text-[8.5rem]">
+          <span className="block h-[3px] w-16 animate-rise bg-tricolor" aria-hidden="true" />
+          <p className="eyebrow mt-6 animate-rise text-foreground/80">Sports training membership</p>
+          <h1 className="text-display mt-5 max-w-4xl animate-rise text-6xl font-extralight [animation-delay:80ms] sm:text-7xl md:text-8xl lg:text-[7.5rem]">
             Train smarter.
             <br />
-            <span className="text-gradient-volt">Move faster.</span>
+            <span className="text-foreground/55">Move faster.</span>
           </h1>
-          <p className="mt-6 max-w-xl animate-rise text-lg text-muted-foreground [animation-delay:160ms]">
+          <p className="mt-8 max-w-xl animate-rise text-lg font-light text-foreground/75 [animation-delay:160ms]">
             Coach-built programs, the science behind them, and AI feedback on your own technique — all in one membership.
           </p>
           <div className="mt-10 flex animate-rise flex-wrap gap-3 [animation-delay:240ms]">
@@ -88,8 +91,8 @@ function Landing() {
       <div className="overflow-hidden border-y border-border/60 bg-surface py-5">
         <div className="flex w-max animate-marquee gap-12">
           {[...sports, ...sports].map((s, i) => (
-            <span key={i} className="text-display flex items-center gap-12 text-3xl text-muted-foreground/60">
-              {s} <span className="size-2 rotate-45 bg-primary" />
+            <span key={i} className="eyebrow flex items-center gap-12 text-sm text-muted-foreground">
+              {s} <span className={`size-1.5 rounded-full ${i % 2 ? "bg-brand-blue" : "bg-brand-red"}`} />
             </span>
           ))}
         </div>
@@ -104,7 +107,7 @@ function Landing() {
               Elite coaching shouldn't be reserved for the elite.
             </h2>
           </div>
-          <div className="space-y-6 text-lg leading-relaxed text-muted-foreground">
+          <div className="space-y-6 text-lg font-light leading-relaxed text-muted-foreground">
             <p>
               Most athletes train hard. Far fewer train with a plan grounded in evidence, or get honest feedback on how they actually move.
             </p>
@@ -115,7 +118,7 @@ function Landing() {
             <ul className="grid gap-3 pt-2 text-base text-foreground sm:grid-cols-2">
               {["Evidence before trends", "Technique before load", "Feedback every week", "Built for every level"].map((t) => (
                 <li key={t} className="flex items-center gap-3">
-                  <span className="grid size-6 place-items-center rounded-full bg-primary/15 text-primary">
+                  <span className="grid size-6 place-items-center rounded-full border border-brand-blue/50 text-brand-blue">
                     <Check className="size-3.5" />
                   </span>
                   {t}
@@ -132,14 +135,14 @@ function Landing() {
           {pillars.map(({ icon: Icon, title, body }, i) => (
             <article
               key={title}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-card p-8 shadow-card transition-transform hover:-translate-y-1"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-foreground/30"
             >
-              <span className="text-display absolute right-6 top-4 text-7xl text-foreground/5">0{i + 1}</span>
-              <span className="grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground">
+              <span className="absolute right-6 top-6 font-mono text-xs text-muted-foreground">0{i + 1}</span>
+              <span className={`grid size-12 place-items-center rounded-md ${pillarTone[i]}`}>
                 <Icon className="size-6" />
               </span>
-              <h3 className="text-display mt-8 text-3xl">{title}</h3>
-              <p className="mt-3 text-muted-foreground">{body}</p>
+              <h3 className="text-display mt-8 text-2xl">{title}</h3>
+              <p className="mt-3 font-light text-muted-foreground">{body}</p>
             </article>
           ))}
         </div>
@@ -155,11 +158,11 @@ function Landing() {
               width={1800}
               height={1390}
               loading="lazy"
-              className="aspect-[4/3] w-full object-cover"
+              className="aspect-[4/3] w-full object-cover saturate-[1.15]"
             />
             <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-border bg-background/80 p-4 backdrop-blur-md">
               <p className="eyebrow">Sample feedback · Jump shot</p>
-              <p className="mt-2 text-sm">
+              <p className="mt-2 text-sm font-light">
                 “Your elbow flares out on the lift and you release on the way down. Keep the elbow under the ball and let it go at the top — try 50 one-hand form shots.”
               </p>
             </div>
@@ -174,10 +177,10 @@ function Landing() {
                 ["Get your breakdown", "AI watches the clip against our technique database and returns strengths, faults, cues and drills."],
               ].map(([t, b], i) => (
                 <li key={t} className="flex gap-5">
-                  <span className="text-display text-4xl text-primary">0{i + 1}</span>
+                  <span className="pt-1 font-mono text-sm text-brand-blue">0{i + 1}</span>
                   <div>
-                    <h3 className="text-xl font-bold not-italic [font-family:var(--font-sans)]">{t}</h3>
-                    <p className="mt-1 text-muted-foreground">{b}</p>
+                    <h3 className="text-lg font-normal tracking-tight">{t}</h3>
+                    <p className="mt-1 font-light text-muted-foreground">{b}</p>
                   </div>
                 </li>
               ))}
@@ -195,11 +198,14 @@ function Landing() {
             width={2000}
             height={1334}
             loading="lazy"
-            className="absolute inset-0 -z-20 h-full w-full object-cover"
+            className="absolute inset-0 -z-20 h-full w-full object-cover saturate-[1.15]"
           />
           <div className="absolute inset-0 -z-10 bg-tint" />
           <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-            <h2 className="text-display max-w-2xl text-5xl md:text-7xl">Your next PR starts with the next rep.</h2>
+            <div>
+              <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
+              <h2 className="text-display mt-6 max-w-2xl text-5xl font-extralight md:text-7xl">Your next PR starts with the next rep.</h2>
+            </div>
             <Button asChild size="xl" variant="hero">
               <Link to="/auth" search={{ mode: "signup" }}>
                 Become a member <ArrowRight />

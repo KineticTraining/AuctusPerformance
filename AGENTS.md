@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Design system
+- All colours, fonts and type styles live as tokens/utilities in `src/styles.css` (`text-display`, `eyebrow`, `brand-red`/`brand-blue`, `bg-tricolor`); pages use those instead of raw colour or font classes so a restyle stays a one-file change.

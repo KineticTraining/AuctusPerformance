@@ -44,10 +44,10 @@ function ArticlesPage() {
         <Link
           to="/articles/$slug"
           params={{ slug: featured.slug }}
-          className="group mt-14 grid overflow-hidden rounded-3xl border border-border bg-gradient-card shadow-card md:grid-cols-[1.3fr_1fr]"
+          className="group mt-14 grid overflow-hidden rounded-3xl border border-border bg-surface md:grid-cols-[1.3fr_1fr]"
         >
           <div className="p-8 md:p-12">
-            <span className="inline-flex rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+            <span className="inline-flex rounded-full border border-brand-red/60 px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-red">
               Featured · {featured.category}
             </span>
             <h2 className="text-display mt-6 text-4xl md:text-6xl">{featured.title}</h2>
@@ -55,7 +55,7 @@ function ArticlesPage() {
             <Byline a={featured} />
           </div>
           <div className="relative hidden items-end justify-end bg-grid p-8 md:flex">
-            <ArrowUpRight className="size-16 text-primary transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
+            <ArrowUpRight className="size-16 stroke-1 text-brand-blue transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" />
           </div>
         </Link>
       )}
@@ -66,7 +66,7 @@ function ArticlesPage() {
             key={c}
             onClick={() => setCat(c)}
             className={cn(
-              "rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors",
+              "rounded-full border px-4 py-1.5 text-sm font-normal transition-colors",
               cat === c ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
@@ -81,10 +81,10 @@ function ArticlesPage() {
             key={a.slug}
             to="/articles/$slug"
             params={{ slug: a.slug }}
-            className="group flex flex-col rounded-2xl border border-border bg-surface p-7 transition-all hover:-translate-y-1 hover:border-primary/40"
+            className="group flex flex-col rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-foreground/30"
           >
             <span className="eyebrow">{a.category}</span>
-            <h3 className="text-display mt-4 text-3xl">{a.title}</h3>
+            <h3 className="text-display mt-4 text-2xl">{a.title}</h3>
             <p className="mt-3 line-clamp-3 flex-1 text-sm text-muted-foreground">{a.excerpt}</p>
             <Byline a={a} />
           </Link>
@@ -97,7 +97,7 @@ function ArticlesPage() {
 function Byline({ a }: { a: { author: string; read_minutes: number; published_at: string } }) {
   return (
     <div className="mt-6 flex items-center gap-4 text-xs text-muted-foreground">
-      <span className="font-semibold text-foreground">{a.author}</span>
+      <span className="font-medium text-foreground">{a.author}</span>
       <span>{formatDate(a.published_at)}</span>
       <span className="flex items-center gap-1">
         <Clock className="size-3.5" /> {a.read_minutes} min

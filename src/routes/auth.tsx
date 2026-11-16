@@ -161,9 +161,9 @@ function AuthPage() {
           </p>
 
           {checkEmail ? (
-            <div className="mt-10 rounded-2xl border border-primary/30 bg-primary/10 p-6">
-              <MailCheck className="size-8 text-primary" />
-              <p className="mt-4 font-semibold">Check your inbox</p>
+            <div className="mt-10 rounded-2xl border border-border bg-surface p-6">
+              <MailCheck className="size-8 stroke-1 text-brand-blue" />
+              <p className="mt-4 font-medium">Check your inbox</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 We sent a link to <span className="text-foreground">{checkEmail}</span>.{" "}
                 {mode === "forgot" ? "Open it to choose a new password." : "Confirm your email to activate your membership."}
@@ -188,7 +188,7 @@ function AuthPage() {
                   <button type="button" className="lovable-auth-button" onClick={() => oauth("lovable")}>
                     Continue with Lovable
                   </button>
-                  <div className="my-3 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
+                  <div className="my-3 flex items-center gap-3 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-muted-foreground">
                     <span className="h-px flex-1 bg-border" /> or with email <span className="h-px flex-1 bg-border" />
                   </div>
                 </div>
@@ -229,7 +229,7 @@ function AuthPage() {
                     error={errors["password"]}
                     action={
                       mode === "signin" ? (
-                        <button type="button" onClick={() => setMode("forgot")} className="text-xs font-semibold text-primary hover:underline">
+                        <button type="button" onClick={() => setMode("forgot")} className="text-xs text-foreground underline-offset-4 hover:underline">
                           Forgot password?
                         </button>
                       ) : undefined
@@ -251,11 +251,11 @@ function AuthPage() {
 
               <p className="mt-8 text-center text-sm text-muted-foreground">
                 {mode === "signup" ? (
-                  <>Already a member? <button className="font-semibold text-primary hover:underline" onClick={() => setMode("signin")}>Sign in</button></>
+                  <>Already a member? <button className="text-foreground underline underline-offset-4 hover:text-brand-blue" onClick={() => setMode("signin")}>Sign in</button></>
                 ) : mode === "forgot" ? (
-                  <button className="font-semibold text-primary hover:underline" onClick={() => setMode("signin")}>Back to sign in</button>
+                  <button className="text-foreground underline underline-offset-4 hover:text-brand-blue" onClick={() => setMode("signin")}>Back to sign in</button>
                 ) : (
-                  <>New to Kinetic? <button className="font-semibold text-primary hover:underline" onClick={() => setMode("signup")}>Create an account</button></>
+                  <>New to Kinetic? <button className="text-foreground underline underline-offset-4 hover:text-brand-blue" onClick={() => setMode("signup")}>Create an account</button></>
                 )}
               </p>
             </>
@@ -273,7 +273,7 @@ function Field({ label, error, action, children }: { label: string; error?: stri
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</Label>
+        <Label className="font-mono text-[0.68rem] font-normal uppercase tracking-[0.16em] text-muted-foreground">{label}</Label>
         {action}
       </div>
       {children}

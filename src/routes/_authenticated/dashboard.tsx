@@ -66,7 +66,7 @@ function Dashboard() {
           ["AI reviews ready", data.submissions.filter((s) => s.status === "complete").length],
         ].map(([label, n]) => (
           <div key={label} className="rounded-2xl border border-border bg-surface p-6">
-            <p className="text-display text-5xl text-primary">{n}</p>
+            <p className="text-display text-5xl font-extralight">{n}</p>
             <p className="mt-1 text-sm text-muted-foreground">{label}</p>
           </div>
         ))}
@@ -79,7 +79,7 @@ function Dashboard() {
             key={s}
             onClick={() => setSection(s)}
             className={cn(
-              "rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors",
+              "rounded-full border px-4 py-1.5 text-sm font-normal transition-colors",
               section === s ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
@@ -89,17 +89,17 @@ function Dashboard() {
       </div>
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {videos.map((v) => (
-          <button key={v.id} onClick={() => setPlaying(v)} className="group overflow-hidden rounded-2xl border border-border bg-surface text-left transition-all hover:-translate-y-1 hover:border-primary/40">
+          <button key={v.id} onClick={() => setPlaying(v)} className="group overflow-hidden rounded-2xl border border-border bg-surface text-left transition-colors hover:border-foreground/30">
             <div className="relative aspect-video overflow-hidden">
               <img src={`https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
               <span className="absolute inset-0 grid place-items-center bg-background/30">
-                <span className="grid size-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-volt"><Play className="size-6" /></span>
+                <span className="grid size-14 place-items-center rounded-full bg-foreground text-background"><Play className="size-6" /></span>
               </span>
-              <span className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-0.5 text-xs font-semibold">{v.duration_label}</span>
+              <span className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-0.5 font-mono text-[0.68rem]">{v.duration_label}</span>
             </div>
             <div className="p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">{v.sport} · {v.level}</p>
-              <h3 className="mt-2 text-lg font-bold">{v.title}</h3>
+              <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-blue">{v.sport} · {v.level}</p>
+              <h3 className="mt-2 text-base font-normal">{v.title}</h3>
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{v.description}</p>
               <p className="mt-3 text-xs text-muted-foreground">{v.coach}</p>
             </div>
