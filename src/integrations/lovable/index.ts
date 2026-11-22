@@ -13,6 +13,32 @@ type SignInOptions = {
 export const lovable = {
   auth: {
     signInWithOAuth: async (provider: OAuthProvider, opts?: SignInOptions) => {
+      const hasSupabase =
+        Boolean(import.meta.env["VITE_SUPABASE_URL"]) &&
+        Boolean(import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"]);
+
+      if (!hasSupabase) {
+        const mockAuth = supabase.auth as unknown as {
+          signInDemo?: () => Promise<{
+            data: { session: { access_token: string; refresh_token: string } | null };
+            error: null;
+          }>;
+        };
+        if (mockAuth.signInDemo) {
+          const demo = await mockAuth.signInDemo();
+          if (demo.data.session) {
+            return {
+              redirected: false as const,
+              error: null,
+              tokens: {
+                access_token: demo.data.session.access_token,
+                refresh_token: demo.data.session.refresh_token,
+              },
+            };
+          }
+        }
+      }
+
       const result = await lovableAuth.signInWithOAuth(provider, {
         ...opts,
         extraParams: {

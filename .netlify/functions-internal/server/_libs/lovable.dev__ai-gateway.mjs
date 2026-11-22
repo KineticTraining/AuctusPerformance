@@ -1,5 +1,5 @@
 import { n as __exportAll } from "../_runtime.mjs";
-//#region node_modules/@lovable.dev/ai-gateway/dist/models-DxUJGvue.js
+//#region node_modules/@lovable.dev/ai-gateway/dist/models-D8p9ZkWt.js
 var GatewayError = class extends Error {
 	attemptCount;
 	httpStatus;
@@ -86,7 +86,7 @@ var UnknownGatewayError = class extends GatewayError {
 };
 var sdkHeaders = {
 	"X-Lovable-AIG-SDK": "lovable-ai-gateway-sdk",
-	"X-Lovable-AIG-SDK-Version": "0.1.11"
+	"X-Lovable-AIG-SDK-Version": "0.1.13"
 };
 var TransportConfigurationError = class extends Error {
 	reason;

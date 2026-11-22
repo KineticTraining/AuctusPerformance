@@ -1,24 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpenText, Check, PlayCircle, ScanEye } from "lucide-react";
+import { ArrowRight, BookOpenText, PlayCircle, UploadCloud, Utensils } from "lucide-react";
 
+import { FaqSection } from "@/components/site/social-proof-faq";
 import { Button } from "@/components/ui/button";
-import heroImg from "@/assets/photos/basketball-arena-hero.jpg.asset.json";
-import trainingCourtImg from "@/assets/photos/indoor-training-court.jpg.asset.json";
-import gameCourtImg from "@/assets/photos/basketball-game-court.jpg.asset.json";
+import { SITE_MEDIA } from "@/lib/media";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Kinetic — Train Smarter. Move Faster." },
+      { title: "Dusk Kinetic Performance — Train Smarter. Move Faster." },
       {
         name: "description",
         content:
-          "Join Kinetic: a training membership with coach-led video library, sports science articles and AI technique review of your own footage.",
+          "Dusk Kinetic Performance: structured training progressions, clear athlete nutrition guides, latest sports science, and AI video technique analysis.",
       },
-      { property: "og:title", content: "Kinetic — Train Smarter. Move Faster." },
+      { property: "og:title", content: "Dusk Kinetic Performance — Train Smarter. Move Faster." },
       {
         property: "og:description",
-        content: "Coach-led video library, sports science and AI technique review for serious athletes.",
+        content:
+          "Coach-led training, performance nutrition, latest science, and AI video analysis for athletes.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -27,157 +27,162 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const sports = ["Basketball", "Sprinting", "Soccer", "Tennis", "Swimming", "Strength", "Football", "Volleyball"];
-
 const pillars = [
   {
     icon: PlayCircle,
-    title: "Video Library",
-    body: "Strength, speed, mobility, sport skills and mindset — organized into training sections you can follow session by session.",
+    title: "Training Library",
+    body: "Strength, speed, mobility, and sport-skill progressions filterable by age group, level, and sport.",
+    to: "/dashboard" as const,
+    cta: "Open library",
+  },
+  {
+    icon: Utensils,
+    title: "Nutrition Guide",
+    body: "Clean age-filtered breakdown of macronutrients, vitamins, and minerals with quick summaries and biochemical depth.",
+    to: "/nutrition" as const,
+    cta: "Explore nutrients",
   },
   {
     icon: BookOpenText,
-    title: "Sports Science",
-    body: "Plain-language breakdowns of the research on sleep, load, power and recovery, written by practitioners.",
+    title: "Latest Science",
+    body: "Sports science articles, peer-reviewed citations, and practical coach takeaways.",
+    to: "/articles" as const,
+    cta: "Read Latest Science",
   },
   {
-    icon: ScanEye,
-    title: "AI Technique Review",
-    body: "Submit a video link and notes. Our AI watches your rep and compares it to a database of coaching cues and common faults.",
+    icon: UploadCloud,
+    title: "AI Video Analysis",
+    body: "Upload a rep clip or paste a link in a dedicated workspace for cue-based technique feedback.",
+    to: "/submit" as const,
+    cta: "Analyze a clip",
   },
 ];
 
-const pillarTone = ["bg-brand-red text-foreground", "bg-foreground text-background", "bg-brand-blue text-foreground"];
+const pillarTone = [
+  "bg-brand-amber text-background",
+  "bg-brand-orange text-background",
+  "bg-brand-coral text-background",
+  "bg-brand-indigo text-foreground",
+];
 
 function Landing() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative isolate overflow-hidden">
+      <section className="relative isolate overflow-hidden border-b border-border/60">
         <img
-          src={heroImg.url}
-          alt="Basketball player standing on an indoor arena court under the lights"
-          width={2400}
-          height={1600}
-          className="absolute inset-0 -z-20 h-full w-full object-cover object-[60%_30%] saturate-[1.15]"
+          src={SITE_MEDIA.heroCourt.src}
+          alt={SITE_MEDIA.heroCourt.alt}
+          width={SITE_MEDIA.heroCourt.width}
+          height={SITE_MEDIA.heroCourt.height}
+          decoding="async"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-90 saturate-[1.08]"
         />
         <div className="absolute inset-0 -z-10 bg-fade-left" />
         <div className="absolute inset-0 -z-10 bg-fade-up" />
-        <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col justify-end px-5 pb-20 pt-32 md:px-8 md:pb-28">
+        <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col justify-end px-5 pb-20 pt-28 md:px-8 md:pb-24">
           <span className="block h-[3px] w-16 animate-rise bg-tricolor" aria-hidden="true" />
-          <p className="eyebrow mt-6 animate-rise text-foreground/80">Sports training membership</p>
-          <h1 className="text-display mt-5 max-w-4xl animate-rise text-6xl font-extralight [animation-delay:80ms] sm:text-7xl md:text-8xl lg:text-[7.5rem]">
+          <p className="eyebrow mt-6 animate-rise text-brand-amber">Dusk Kinetic Performance</p>
+          <h1 className="text-display mt-4 max-w-4xl animate-rise text-5xl [animation-delay:80ms] sm:text-7xl md:text-8xl">
             Train smarter.
             <br />
-            <span className="text-foreground/55">Move faster.</span>
+            <span className="text-sunset">Move faster at dusk.</span>
           </h1>
-          <p className="mt-8 max-w-xl animate-rise text-lg font-light text-foreground/75 [animation-delay:160ms]">
-            Coach-built programs, the science behind them, and AI feedback on your own technique — all in one membership.
+          <p className="mt-6 max-w-xl animate-rise text-lg font-light text-foreground/85 [animation-delay:160ms]">
+            Structured training progressions, clear nutrition science, and fast video technique
+            analysis — designed to stay simple from day one.
           </p>
-          <div className="mt-10 flex animate-rise flex-wrap gap-3 [animation-delay:240ms]">
-            <Button asChild variant="hero" size="xl">
+          <div className="mt-9 flex animate-rise flex-wrap gap-3 [animation-delay:240ms]">
+            <Button asChild variant="hero" size="xl" className="min-h-12">
               <Link to="/auth" search={{ mode: "signup" }}>
-                Start training <ArrowRight />
+                Start training <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
-            <Button asChild variant="glass" size="xl">
-              <Link to="/articles">Read the science</Link>
+            <Button asChild variant="glass" size="xl" className="min-h-12">
+              <Link to="/nutrition">Explore Nutrition Guide</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* MARQUEE */}
-      <div className="overflow-hidden border-y border-border/60 bg-surface py-6">
-        <div className="flex w-max animate-marquee gap-14">
-          {[...sports, ...sports].map((s, i) => (
-            <span key={i} className="flex items-center whitespace-nowrap font-sans text-lg font-semibold uppercase tracking-wide text-foreground">
-              {s}
-            </span>
-          ))}
+      {/* CORE PILLARS */}
+      <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
+        <div className="max-w-2xl">
+          <p className="eyebrow text-brand-amber">Platform Overview</p>
+          <h2 className="text-display mt-3 text-4xl md:text-5xl">
+            Four focused tools. Zero clutter.
+          </h2>
+          <p className="mt-3 text-base font-light text-muted-foreground">
+            Start with foundational drills, check what your body needs at your age, read the latest
+            research, or upload a clip for technique feedback.
+          </p>
         </div>
-      </div>
 
-      {/* MISSION */}
-      <section className="relative bg-grid">
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-24 md:grid-cols-[1fr_1.2fr] md:px-8 md:py-32">
-          <div>
-            <p className="eyebrow">Our mission</p>
-            <h2 className="text-display mt-4 text-5xl md:text-6xl">
-              Elite coaching shouldn't be reserved for the elite.
-            </h2>
-          </div>
-          <div className="space-y-6 text-lg font-light leading-relaxed text-muted-foreground">
-            <p>
-              Most athletes train hard. Far fewer train with a plan grounded in evidence, or get honest feedback on how they actually move.
-            </p>
-            <p>
-              Kinetic brings together the coaching content, the sports science and the technique review that used to require a pro
-              program — so a high-school sprinter, a weekend tennis player and a college hooper can all train with intent.
-            </p>
-            <ul className="grid gap-3 pt-2 text-base text-foreground sm:grid-cols-2">
-              {["Evidence before trends", "Technique before load", "Feedback every week", "Built for every level"].map((t) => (
-                <li key={t} className="flex items-center gap-3">
-                  <span className="grid size-6 place-items-center rounded-full border border-brand-blue/50 text-brand-blue">
-                    <Check className="size-3.5" />
-                  </span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* PILLARS */}
-      <section className="mx-auto max-w-7xl px-5 pb-24 md:px-8 md:pb-32">
-        <div className="grid gap-5 md:grid-cols-3">
-          {pillars.map(({ icon: Icon, title, body }, i) => (
-            <article
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {pillars.map(({ icon: Icon, title, body, to, cta }, i) => (
+            <Link
               key={title}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-8 transition-colors hover:border-foreground/30"
+              to={to}
+              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface p-7 transition-colors hover:border-brand-amber/50"
             >
-              <span className="absolute right-6 top-6 font-mono text-xs text-muted-foreground">0{i + 1}</span>
-              <span className={`grid size-12 place-items-center rounded-md ${pillarTone[i]}`}>
-                <Icon className="size-6" />
-              </span>
-              <h3 className="text-display mt-8 text-2xl">{title}</h3>
-              <p className="mt-3 font-light text-muted-foreground">{body}</p>
-            </article>
+              <div>
+                <span className="absolute right-6 top-6 font-mono text-xs text-muted-foreground tabular-nums">
+                  0{i + 1}
+                </span>
+                <span className={`grid size-11 place-items-center rounded-md ${pillarTone[i]}`}>
+                  <Icon className="size-5" aria-hidden="true" />
+                </span>
+                <h3 className="text-display mt-7 text-2xl">{title}</h3>
+                <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
+                  {body}
+                </p>
+              </div>
+              <p className="mt-6 font-mono text-xs uppercase tracking-[0.14em] text-brand-amber group-hover:underline">
+                {cta} →
+              </p>
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* AI REVIEW */}
+      {/* AI VIDEO UPLOAD & ANALYSIS WORKFLOW */}
       <section className="border-y border-border/60 bg-surface">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-24 md:grid-cols-2 md:px-8">
-          <div className="relative overflow-hidden rounded-2xl border border-border">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 md:grid-cols-2 md:px-8 md:py-24">
+          <div className="overflow-hidden rounded-2xl border border-border bg-background">
             <img
-              src={trainingCourtImg.url}
-              alt="Two players running a dribbling drill in an indoor training gym"
-              width={1800}
-              height={1390}
+              src={SITE_MEDIA.trainingGym.src}
+              alt={SITE_MEDIA.trainingGym.alt}
+              width={SITE_MEDIA.trainingGym.width}
+              height={SITE_MEDIA.trainingGym.height}
               loading="lazy"
-              className="aspect-[4/3] w-full object-cover saturate-[1.15]"
+              decoding="async"
+              className="aspect-[4/3] w-full object-cover saturate-[1.06]"
             />
-            <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-border bg-background/80 p-4 backdrop-blur-md">
-              <p className="eyebrow">Sample feedback · Jump shot</p>
-              <p className="mt-2 text-sm font-light">
-                “Your elbow flares out on the lift and you release on the way down. Keep the elbow under the ball and let it go at the top — try 50 one-hand form shots.”
-              </p>
-            </div>
           </div>
           <div>
-            <p className="eyebrow">How video review works</p>
-            <h2 className="text-display mt-4 text-5xl md:text-6xl">Your rep, measured against the cues that matter.</h2>
-            <ol className="mt-10 space-y-6">
+            <p className="eyebrow text-brand-orange">Dedicated AI Video Workspace</p>
+            <h2 className="text-display mt-4 text-4xl md:text-5xl">
+              Upload your clip. Get clear technique cues.
+            </h2>
+            <ol className="mt-8 space-y-6">
               {[
-                ["Share a link", "Paste a YouTube link to your rep and pick the technique you're working on."],
-                ["Add context", "Tell us what you feel, what your coach says, and what you want fixed."],
-                ["Get your breakdown", "AI watches the clip against our technique database and returns strengths, faults, cues and drills."],
+                [
+                  "Upload a clip or paste a link",
+                  "Select a training video directly from your device or paste a YouTube URL in the AI Video tab.",
+                ],
+                [
+                  "Choose your target skill & notes",
+                  "Tag the movement you are practicing and add quick notes on timing, balance, or fatigue.",
+                ],
+                [
+                  "Review strengths & corrective drills",
+                  "Receive structured feedback aligned with our technique cues and recommended next-session drills.",
+                ],
               ].map(([t, b], i) => (
                 <li key={t} className="flex gap-5">
-                  <span className="pt-1 font-mono text-sm text-brand-blue">0{i + 1}</span>
+                  <span className="pt-1 font-mono text-sm text-brand-amber tabular-nums">
+                    0{i + 1}
+                  </span>
                   <div>
                     <h3 className="text-lg font-normal tracking-tight">{t}</h3>
                     <p className="mt-1 font-light text-muted-foreground">{b}</p>
@@ -185,30 +190,43 @@ function Landing() {
                 </li>
               ))}
             </ol>
+            <div className="mt-8">
+              <Button asChild variant="hero" size="lg" className="min-h-11">
+                <Link to="/submit">
+                  Open AI Video Analysis <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* INTERACTIVE FAQ */}
+      <FaqSection />
+
       {/* CTA */}
-      <section className="mx-auto max-w-7xl px-5 py-24 md:px-8 md:py-32">
+      <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
         <div className="relative isolate overflow-hidden rounded-3xl border border-border p-10 md:p-16">
           <img
-            src={gameCourtImg.url}
-            alt=""
-            width={2000}
-            height={1334}
+            src={SITE_MEDIA.arenaCta.src}
+            alt={SITE_MEDIA.arenaCta.alt}
+            width={SITE_MEDIA.arenaCta.width}
+            height={SITE_MEDIA.arenaCta.height}
             loading="lazy"
-            className="absolute inset-0 -z-20 h-full w-full object-cover saturate-[1.15]"
+            decoding="async"
+            className="absolute inset-0 -z-20 h-full w-full object-cover brightness-75 saturate-[1.08]"
           />
           <div className="absolute inset-0 -z-10 bg-tint" />
           <div className="relative flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
               <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
-              <h2 className="text-display mt-6 max-w-2xl text-5xl font-extralight md:text-7xl">Your next PR starts with the next rep.</h2>
+              <h2 className="text-display mt-6 max-w-2xl text-4xl font-light md:text-6xl">
+                Ready to put consistent work in?
+              </h2>
             </div>
-            <Button asChild size="xl" variant="hero">
+            <Button asChild size="xl" variant="hero" className="min-h-12">
               <Link to="/auth" search={{ mode: "signup" }}>
-                Become a member <ArrowRight />
+                Create free account <ArrowRight aria-hidden="true" />
               </Link>
             </Button>
           </div>

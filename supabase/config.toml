@@ -1,1 +1,19 @@
 project_id = "akovjzmgpqsislnsokun"
+
+[auth]
+enabled = true
+site_url = "https://ais-dev-df3zul4fz5cyhyeoi4ca3h-300143264935.us-east1.run.app"
+additional_redirect_urls = [
+  "https://ais-dev-df3zul4fz5cyhyeoi4ca3h-300143264935.us-east1.run.app/auth/callback",
+  "https://ais-dev-df3zul4fz5cyhyeoi4ca3h-300143264935.us-east1.run.app/dashboard",
+  "https://ais-pre-df3zul4fz5cyhyeoi4ca3h-300143264935.us-east1.run.app/auth/callback",
+  "https://ais-pre-df3zul4fz5cyhyeoi4ca3h-300143264935.us-east1.run.app/dashboard",
+  "http://localhost:3000/auth/callback",
+  "http://localhost:3000/dashboard",
+]
+
+[auth.external.google]
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_CLIENT_SECRET)"
+skip_nonce_check = false

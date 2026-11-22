@@ -1,13 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Play } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
+import { MultiFilterBar } from "@/components/site/multi-filter-bar";
+import { DashboardSkeleton } from "@/components/site/page-skeletons";
+import { SportFilter } from "@/components/site/sport-filter";
+import { WorkspaceTabs } from "@/components/site/workspace-tabs";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { SportFilter } from "@/components/site/sport-filter";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { getBillingStatus } from "@/lib/billing.functions";
+import { getVideoThumbnail, SITE_MEDIA } from "@/lib/media";
+import { SEED_VIDEOS, type VideoSeedRow } from "@/lib/mock-seed";
+import { getTierById } from "@/lib/plans";
+import { matchesAgeFilter, matchesExperienceFilter } from "@/lib/sports";
 import { cn } from "@/lib/utils";
+
+const SEED_VIDEO_BY_YT = new Map(SEED_VIDEOS.map((sv) => [sv.youtube_id, sv]));
 
 const dashboardQuery = () =>
   queryOptions({
@@ -15,110 +28,364 @@ const dashboardQuery = () =>
     queryFn: async () => {
       const [{ data: auth }, videos, subs] = await Promise.all([
         supabase.auth.getUser(),
-        supabase.from("videos").select("*").order("section").order("sort_order"),
-        supabase.from("submissions").select("id, title, status, created_at").order("created_at", { ascending: false }).limit(5),
+        supabase
+          .from("videos")
+          .select(
+            "id, created_at, section, title, description, sport, sports, level, duration_label, youtube_id, coach, sort_order",
+          )
+          .order("section")
+          .order("sort_order"),
+        supabase
+          .from("submissions")
+          .select("id, title, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
       ]);
       const userId = auth.user?.id ?? "";
-      const { data: profile } = await supabase.from("profiles").select("display_name, sport, level").eq("id", userId).maybeSingle();
-      return { profile, videos: videos.data ?? [], submissions: subs.data ?? [] };
+      const { data: profile } = userId
+        ? await supabase
+            .from("profiles")
+            .select("display_name, sport, level")
+            .eq("id", userId)
+            .maybeSingle()
+        : { data: null };
+
+      const rawVideos = videos.data && videos.data.length > 0 ? videos.data : SEED_VIDEOS;
+
+      const enrichedVideos: VideoSeedRow[] = rawVideos.map((v) => {
+        const seedMeta = SEED_VIDEO_BY_YT.get(v.youtube_id);
+        const raw = v as VideoSeedRow;
+        return {
+          ...v,
+          age_groups: raw.age_groups ??
+            seedMeta?.age_groups ?? ["Young Adult (18–29)", "Adult (30–45)"],
+          experience_levels:
+            raw.experience_levels ??
+            seedMeta?.experience_levels ??
+            (v.level === "All levels" ? ["Beginner", "Intermediate", "Advanced"] : [v.level]),
+        };
+      });
+
+      const meta = (auth.user?.user_metadata ?? {}) as Record<string, string | undefined>;
+      const resolvedProfile = profile ?? {
+        display_name: meta["display_name"] ?? auth.user?.email?.split("@")[0] ?? "Athlete",
+        sport: meta["sport"] ?? "",
+        level: meta["level"] ?? "",
+      };
+
+      return { profile: resolvedProfile, videos: enrichedVideos, submissions: subs.data ?? [] };
     },
   });
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Kinetic" },
-      { name: "description", content: "Your Kinetic training dashboard and video library." },
-      { property: "og:title", content: "Dashboard — Kinetic" },
-      { property: "og:description", content: "Your Kinetic training dashboard and video library." },
+      { title: "Training Library — Dusk Kinetic Performance" },
+      {
+        name: "description",
+        content: "Your Dusk Kinetic Performance training dashboard and video library.",
+      },
+      { property: "og:title", content: "Training Library — Dusk Kinetic Performance" },
+      {
+        property: "og:description",
+        content: "Your Dusk Kinetic Performance training dashboard and video library.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  pendingComponent: DashboardSkeleton,
   loader: ({ context }) => context.queryClient.ensureQueryData(dashboardQuery()),
   component: Dashboard,
 });
 
-const SECTIONS = ["Strength & Power", "Speed & Agility", "Mobility & Recovery", "Sport Skills", "Mindset"];
+const SECTIONS = [
+  "All sections",
+  "Strength & Power",
+  "Speed & Agility",
+  "Mobility & Recovery",
+  "Sport Skills",
+  "Mindset",
+];
 
 function Dashboard() {
   const { data } = useSuspenseQuery(dashboardQuery());
-  const [section, setSection] = useState(SECTIONS[0]!);
+  const fetchBillingStatus = useServerFn(getBillingStatus);
+  const billingQuery = useQuery({
+    queryKey: ["billing-status"],
+    queryFn: () => fetchBillingStatus(),
+  });
+
+  const [section, setSection] = useState("All sections");
+  const [ageGroup, setAgeGroup] = useState("All");
+  const [experienceLevel, setExperienceLevel] = useState("All");
+  const [search, setSearch] = useState("");
   const [playing, setPlaying] = useState<{ youtube_id: string; title: string } | null>(null);
   const [sportFilters, setSportFilters] = useState<string[]>([]);
-  const videos = data.videos.filter(
-    (v) => v.section === section && (sportFilters.length === 0 || v.sports.some((s) => sportFilters.includes(s))),
+  const [showAllVideos, setShowAllVideos] = useState(false);
+
+  const isSubscribed =
+    billingQuery.data?.status === "active" || billingQuery.data?.status === "trialing";
+  const activeTier = isSubscribed ? getTierById(billingQuery.data?.plan) : undefined;
+  const maxSportFilters = activeTier?.maxSportFilters ?? null;
+
+  useEffect(() => {
+    if (typeof maxSportFilters === "number" && sportFilters.length > maxSportFilters) {
+      setSportFilters((prev) => prev.slice(0, maxSportFilters));
+    }
+  }, [maxSportFilters, sportFilters.length]);
+
+  const queryLower = search.trim().toLowerCase();
+
+  const videos = useMemo(() => {
+    const sectionVideos = data.videos.filter(
+      (v) =>
+        (section === "All sections" || v.section === section) &&
+        (sportFilters.length === 0 || v.sports.some((s) => sportFilters.includes(s))) &&
+        matchesAgeFilter(v.age_groups, ageGroup) &&
+        matchesExperienceFilter(v.experience_levels, experienceLevel) &&
+        (!queryLower ||
+          v.title.toLowerCase().includes(queryLower) ||
+          v.description.toLowerCase().includes(queryLower) ||
+          v.coach.toLowerCase().includes(queryLower) ||
+          v.sport.toLowerCase().includes(queryLower)),
+    );
+
+    if (activeTier?.videoAccess !== "beginner_some_intermediate") {
+      return sectionVideos;
+    }
+
+    const intermediatePerSection = new Map<string, number>();
+    return sectionVideos.filter((v) => {
+      if (v.level === "Beginner" || v.level === "All levels") return true;
+      if (v.level === "Intermediate") {
+        const used = intermediatePerSection.get(v.section) ?? 0;
+        if (used === 0) {
+          intermediatePerSection.set(v.section, 1);
+          return true;
+        }
+      }
+      return false;
+    });
+  }, [
+    data.videos,
+    section,
+    sportFilters,
+    ageGroup,
+    experienceLevel,
+    queryLower,
+    activeTier?.videoAccess,
+  ]);
+
+  const hasActiveFilters =
+    section !== "All sections" ||
+    ageGroup !== "All" ||
+    experienceLevel !== "All" ||
+    search.trim() !== "" ||
+    sportFilters.length > 0;
+
+  // Uncluttered starter set when no filters are active
+  const visibleVideos = useMemo(
+    () => (!hasActiveFilters && !showAllVideos ? videos.slice(0, 4) : videos),
+    [hasActiveFilters, showAllVideos, videos],
   );
+
+  function resetAllFilters() {
+    setSection("All sections");
+    setAgeGroup("All");
+    setExperienceLevel("All");
+    setSearch("");
+    setSportFilters([]);
+  }
+
   const name = data.profile?.display_name?.split(" ")[0] || "Athlete";
+  const reviewsReadyCount = useMemo(
+    () => data.submissions.filter((s) => s.status === "complete").length,
+    [data.submissions],
+  );
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16">
+    <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-14">
+      <WorkspaceTabs active="library" />
+
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="eyebrow">{[data.profile?.sport, data.profile?.level].filter(Boolean).join(" · ") || "Member"}</p>
-          <h1 className="text-display mt-3 text-5xl md:text-7xl">Let's work, {name}.</h1>
+          <p className="eyebrow text-brand-amber">
+            {[
+              data.profile?.sport,
+              data.profile?.level,
+              activeTier ? `${activeTier.name} Plan` : null,
+            ]
+              .filter(Boolean)
+              .join(" · ") || "Training Library"}
+          </p>
+          <h1 className="text-display mt-3 text-4xl sm:text-5xl md:text-6xl">
+            Let&apos;s work, {name}.
+          </h1>
+          <p className="mt-2 font-mono text-xs text-muted-foreground tabular-nums">
+            {data.videos.length} library videos · {data.submissions.length} submissions ·{" "}
+            {reviewsReadyCount} AI reviews ready
+          </p>
         </div>
-        <Button asChild variant="hero" size="xl">
-          <Link to="/submit">Submit a video <ArrowRight /></Link>
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          {billingQuery.isLoading ? (
+            <Skeleton className="h-11 w-36" />
+          ) : (
+            <Button asChild variant="glass" size="lg" className="min-h-11">
+              <Link to="/pricing">
+                {activeTier ? `${activeTier.name} plan` : "Plans & pricing"}
+              </Link>
+            </Button>
+          )}
+          <Button asChild variant="hero" size="lg" className="min-h-11">
+            <Link to="/submit">
+              Open AI Video Analysis <ArrowRight aria-hidden="true" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-3">
-        {[
-          ["Videos in library", data.videos.length],
-          ["Your submissions", data.submissions.length],
-          ["AI reviews ready", data.submissions.filter((s) => s.status === "complete").length],
-        ].map(([label, n]) => (
-          <div key={label} className="rounded-2xl border border-border bg-surface p-6">
-            <p className="text-display text-5xl font-extralight">{n}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{label}</p>
-          </div>
-        ))}
-      </div>
-
-      <h2 className="text-display mt-16 text-4xl">Video library</h2>
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-10 flex flex-wrap gap-2">
         {SECTIONS.map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setSection(s)}
             className={cn(
-              "rounded-full border px-4 py-1.5 text-sm font-normal transition-colors",
-              section === s ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground",
+              "min-h-10 rounded-full border px-4 py-1.5 text-sm font-normal whitespace-nowrap transition-colors",
+              section === s
+                ? "border-brand-amber bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
             {s}
           </button>
         ))}
       </div>
-      <div className="mt-6">
-        <SportFilter selected={sportFilters} onChange={setSportFilters} />
-      </div>
-      {videos.length === 0 && (
-        <p className="mt-10 text-sm text-muted-foreground">No videos match these filters in this section yet.</p>
-      )}
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {videos.map((v) => (
-          <button key={v.id} onClick={() => setPlaying(v)} className="group overflow-hidden rounded-2xl border border-border bg-surface text-left transition-colors hover:border-foreground/30">
-            <div className="relative aspect-video overflow-hidden">
-              <img src={`https://i.ytimg.com/vi/${v.youtube_id}/hqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-              <span className="absolute inset-0 grid place-items-center bg-background/30">
-                <span className="grid size-14 place-items-center rounded-full bg-foreground text-background"><Play className="size-6" /></span>
-              </span>
-              <span className="absolute bottom-2 right-2 rounded bg-background/80 px-2 py-0.5 font-mono text-[0.68rem]">{v.duration_label}</span>
-            </div>
-            <div className="p-5">
-              <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-blue">{v.sport} · {v.level}</p>
-              <h3 className="mt-2 text-base font-normal">{v.title}</h3>
-              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{v.description}</p>
-              <p className="mt-3 text-xs text-muted-foreground">{v.coach}</p>
-            </div>
-          </button>
-        ))}
+
+      <div className="mt-6 space-y-5">
+        <MultiFilterBar
+          ageGroup={ageGroup}
+          onAgeGroupChange={setAgeGroup}
+          experienceLevel={experienceLevel}
+          onExperienceLevelChange={setExperienceLevel}
+          search={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="Search drills, coaches, or movements..."
+          hasActiveFilters={hasActiveFilters}
+          onReset={resetAllFilters}
+          resultCount={videos.length}
+          totalCount={data.videos.length}
+        />
+
+        <SportFilter
+          selected={sportFilters}
+          onChange={setSportFilters}
+          maxSelections={maxSportFilters}
+          onLimitReached={(limit) =>
+            toast.info(
+              `Your ${activeTier?.name ?? "current"} plan includes up to ${limit} sport filters. Upgrade on Pricing for more.`,
+            )
+          }
+        />
       </div>
 
+      {videos.length === 0 && (
+        <div className="mt-10 rounded-2xl border border-border bg-surface p-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            No training videos match these combined filters yet.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={resetAllFilters}
+            className="mt-4"
+          >
+            Reset all filters
+          </Button>
+        </div>
+      )}
+
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {visibleVideos.map((v) => {
+          const thumb = getVideoThumbnail({
+            youtubeId: v.youtube_id,
+            sport: v.sport,
+            section: v.section,
+            title: v.title,
+            coach: v.coach,
+          });
+          return (
+            <button
+              key={v.id}
+              type="button"
+              onClick={() => setPlaying(v)}
+              aria-label={`Play ${v.title} coached by ${v.coach}`}
+              className="group overflow-hidden rounded-2xl border border-border bg-surface text-left transition-colors hover:border-brand-amber/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="relative aspect-video overflow-hidden bg-background">
+                <img
+                  src={thumb.src}
+                  alt={thumb.alt}
+                  width={1280}
+                  height={720}
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    const el = e.currentTarget;
+                    if (el.dataset["fallbackApplied"]) return;
+                    el.dataset["fallbackApplied"] = "1";
+                    el.src = SITE_MEDIA.trainingGym.src;
+                  }}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <span className="absolute inset-0 grid place-items-center bg-background/35 transition-colors group-hover:bg-background/20">
+                  <span className="grid size-12 place-items-center rounded-full bg-foreground text-background shadow-lg">
+                    <Play className="size-5" aria-hidden="true" />
+                  </span>
+                </span>
+                <span className="absolute bottom-2 right-2 rounded bg-background/85 px-2 py-0.5 font-mono text-[0.68rem] text-foreground tabular-nums">
+                  {v.duration_label}
+                </span>
+              </div>
+              <div className="p-4">
+                <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-brand-amber">
+                  {v.sport} · {v.level}
+                </p>
+                <h3 className="mt-1.5 text-base font-normal text-foreground">{v.title}</h3>
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                  {v.description}
+                </p>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {v.coach} · {v.age_groups.length === 4 ? "All ages" : v.age_groups[0]}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {!hasActiveFilters && videos.length > 4 && (
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/70 bg-surface/60 px-5 py-3.5 text-sm">
+          <p className="text-muted-foreground">
+            {showAllVideos
+              ? `Showing all ${videos.length} training videos.`
+              : `Showing 4 starter fundamentals. Apply any filter above or expand all ${videos.length} videos.`}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAllVideos((prev) => !prev)}
+          >
+            {showAllVideos ? "Show starter set (4)" : `Browse all ${videos.length} videos`}
+          </Button>
+        </div>
+      )}
+
       <Dialog open={!!playing} onOpenChange={(o) => !o && setPlaying(null)}>
-        <DialogContent className="max-w-4xl p-0">
+        <DialogContent className="max-w-4xl overflow-hidden p-0">
           <DialogTitle className="sr-only">{playing?.title}</DialogTitle>
           {playing && (
             <iframe
