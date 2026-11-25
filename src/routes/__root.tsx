@@ -64,19 +64,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dusk Kinetic Performance — Sports Science, Nutrition & Coaching" },
+      { name: "viewport", content: "width=device-width, initial-scale=1.0" },
+      { title: "Auctus Performance — Sports Science, Nutrition & Athletic Coaching" },
       {
         name: "description",
         content:
-          "Dusk Kinetic Performance: coach-built athletic training, nutrition protocols, sports science research, and AI technique review.",
+          "Auctus Performance: understand the science behind athletics and health without wasting time—training progressions, verified nutrition data, latest science, and AI video analysis.",
       },
-      { name: "author", content: "Dusk Kinetic Performance" },
-      { property: "og:title", content: "Dusk Kinetic Performance" },
+      { name: "author", content: "Auctus Performance" },
+      { property: "og:title", content: "Auctus Performance" },
       {
         property: "og:description",
         content:
-          "Athletic training library, sports nutrition protocols, editorial research, and AI technique review.",
+          "Athletic training library, verified sports nutrition guide, research hub, and AI movement analysis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap",
       },
     ],
   }),
@@ -121,9 +121,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col overflow-x-clip">
           <SiteHeader />
-          <main className="flex-1">
+          <main className="min-w-0 flex-1">
             <Outlet />
           </main>
           <SiteFooter />

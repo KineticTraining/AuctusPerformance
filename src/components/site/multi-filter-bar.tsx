@@ -68,7 +68,7 @@ export function MultiFilterBar({
                 value={search ?? ""}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="h-10 bg-background pl-9 text-sm"
+                className="h-11 bg-background pl-9 text-sm"
               />
             </div>
           </div>
@@ -79,7 +79,7 @@ export function MultiFilterBar({
             Age Group
           </label>
           <Select value={ageGroup} onValueChange={onAgeGroupChange}>
-            <SelectTrigger aria-label="Filter by age group" className="h-10 bg-background text-sm">
+            <SelectTrigger aria-label="Filter by age group" className="h-11 bg-background text-sm">
               <SelectValue placeholder="All ages" />
             </SelectTrigger>
             <SelectContent>
@@ -100,7 +100,7 @@ export function MultiFilterBar({
           <Select value={experienceLevel} onValueChange={onExperienceLevelChange}>
             <SelectTrigger
               aria-label="Filter by experience level"
-              className="h-10 bg-background text-sm"
+              className="h-11 bg-background text-sm"
             >
               <SelectValue placeholder="All levels" />
             </SelectTrigger>
@@ -123,7 +123,7 @@ export function MultiFilterBar({
             <Select value={topic ?? "All"} onValueChange={onTopicChange}>
               <SelectTrigger
                 aria-label={`Filter by ${topicLabel}`}
-                className="h-10 bg-background text-sm"
+                className="h-11 bg-background text-sm"
               >
                 <SelectValue placeholder="All topics" />
               </SelectTrigger>
@@ -153,7 +153,7 @@ export function MultiFilterBar({
           size="sm"
           onClick={onReset}
           disabled={!hasActiveFilters}
-          className="min-h-9 gap-1.5 text-xs"
+          className="min-h-11 gap-1.5 text-xs"
         >
           <RotateCcw className="size-3.5" aria-hidden="true" />
           Reset filters

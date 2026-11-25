@@ -15,6 +15,7 @@ import {
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
+import { PageWithOutline, type OutlineSection } from "@/components/site/page-outline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,9 +58,14 @@ import {
 } from "@/lib/sports";
 import { cn } from "@/lib/utils";
 
-const ADMIN_TOKEN_STORAGE_KEY = "dusk_admin_session_token";
+const ADMIN_TOKEN_STORAGE_KEY = "auctus_admin_session_token";
 
 type AdminTab = "articles" | "newsletters" | "nutrition";
+
+const ADMIN_OUTLINE: OutlineSection[] = [
+  { id: "admin-overview", label: "Studio Overview" },
+  { id: "admin-workspace", label: "CMS Workspace" },
+];
 
 function slugify(text: string): string {
   return text
@@ -300,12 +306,17 @@ export function AdminStudio() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16">
-      <div className="flex flex-col gap-5 border-b border-border/70 pb-8 md:flex-row md:items-end md:justify-between">
+    <PageWithOutline sections={ADMIN_OUTLINE} title="Admin Studio">
+      <div
+        id="admin-overview"
+        className="scroll-mt-24 flex flex-col gap-5 border-b border-border/70 pb-8 md:flex-row md:items-end md:justify-between"
+      >
         <div>
           <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
           <p className="eyebrow mt-5 text-brand-amber">Admin Mode Active · Authenticated CMS</p>
-          <h1 className="text-display mt-2 text-4xl sm:text-5xl">Dusk Kinetic Admin Studio</h1>
+          <h1 className="text-display mt-2 text-4xl sm:text-5xl">
+            Auctus Performance Admin Studio
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Publish research posts, data conclusions, newsletters, and nutrition protocols live to
             the site.
@@ -329,81 +340,83 @@ export function AdminStudio() {
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap gap-2">
-        {(
-          [
-            ["articles", `Articles & Data Conclusions (${articles.length})`],
-            ["newsletters", `Newsletters (${newsletters.length})`],
-            ["nutrition", `Nutrient Guide (${nutrition.length})`],
-          ] as const
-        ).map(([tab, label]) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              "min-h-10 rounded-full border px-4 py-1.5 text-sm transition-colors",
-              activeTab === tab
-                ? "border-brand-amber bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {loadingContent ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="size-7 animate-spin text-brand-amber" />
+      <section id="admin-workspace" className="scroll-mt-24">
+        <div className="mt-8 flex flex-wrap gap-2">
+          {(
+            [
+              ["articles", `Articles & Data Conclusions (${articles.length})`],
+              ["newsletters", `Newsletters (${newsletters.length})`],
+              ["nutrition", `Nutrient Guide (${nutrition.length})`],
+            ] as const
+          ).map(([tab, label]) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "min-h-11 rounded-full border px-4 py-2 text-sm transition-colors",
+                activeTab === tab
+                  ? "border-brand-amber bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      ) : activeTab === "articles" ? (
-        <ArticlesEditor
-          adminToken={adminToken}
-          articles={articles}
-          onSave={async (payload) => {
-            await upsertArticleFn({ data: payload });
-            await refreshCmsContent(adminToken);
-            invalidatePublicContent();
-          }}
-          onDelete={async (slug) => {
-            await deleteArticleFn({ data: { adminToken, slug } });
-            await refreshCmsContent(adminToken);
-            invalidatePublicContent();
-          }}
-        />
-      ) : activeTab === "newsletters" ? (
-        <NewslettersEditor
-          adminToken={adminToken}
-          newsletters={newsletters}
-          onSave={async (payload) => {
-            await upsertNewsletterFn({ data: payload });
-            await refreshCmsContent(adminToken);
-            invalidatePublicContent();
-          }}
-          onDelete={async (id) => {
-            await deleteNewsletterFn({ data: { adminToken, id } });
-            await refreshCmsContent(adminToken);
-            invalidatePublicContent();
-          }}
-        />
-      ) : (
-        <NutritionEditor
-          adminToken={adminToken}
-          entries={nutrition}
-          onSave={async (payload) => {
-            await upsertNutritionFn({ data: payload });
-            await refreshCmsContent(adminToken);
-            invalidatePublicContent();
-          }}
-          onDelete={async (id) => {
-            await deleteNutritionFn({ data: { adminToken, id } });
-            await refreshCmsContent(adminToken);
-            invalidatePublicContent();
-          }}
-        />
-      )}
-    </div>
+
+        {loadingContent ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="size-7 animate-spin text-brand-amber" />
+          </div>
+        ) : activeTab === "articles" ? (
+          <ArticlesEditor
+            adminToken={adminToken}
+            articles={articles}
+            onSave={async (payload) => {
+              await upsertArticleFn({ data: payload });
+              await refreshCmsContent(adminToken);
+              invalidatePublicContent();
+            }}
+            onDelete={async (slug) => {
+              await deleteArticleFn({ data: { adminToken, slug } });
+              await refreshCmsContent(adminToken);
+              invalidatePublicContent();
+            }}
+          />
+        ) : activeTab === "newsletters" ? (
+          <NewslettersEditor
+            adminToken={adminToken}
+            newsletters={newsletters}
+            onSave={async (payload) => {
+              await upsertNewsletterFn({ data: payload });
+              await refreshCmsContent(adminToken);
+              invalidatePublicContent();
+            }}
+            onDelete={async (id) => {
+              await deleteNewsletterFn({ data: { adminToken, id } });
+              await refreshCmsContent(adminToken);
+              invalidatePublicContent();
+            }}
+          />
+        ) : (
+          <NutritionEditor
+            adminToken={adminToken}
+            entries={nutrition}
+            onSave={async (payload) => {
+              await upsertNutritionFn({ data: payload });
+              await refreshCmsContent(adminToken);
+              invalidatePublicContent();
+            }}
+            onDelete={async (id) => {
+              await deleteNutritionFn({ data: { adminToken, id } });
+              await refreshCmsContent(adminToken);
+              invalidatePublicContent();
+            }}
+          />
+        )}
+      </section>
+    </PageWithOutline>
   );
 }
 
@@ -439,9 +452,9 @@ function ArticlesEditor({
   const [editingOriginalSlug, setEditingOriginalSlug] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState<(typeof ARTICLE_CATEGORIES)[number]>("Training Science");
-  const [author, setAuthor] = useState("Coach Daniel Reyes");
-  const [authorRole, setAuthorRole] = useState("Head Coach & Performance Director");
+  const [category, setCategory] = useState<(typeof ARTICLE_CATEGORIES)[number]>("Training");
+  const [author, setAuthor] = useState("");
+  const [authorRole, setAuthorRole] = useState("");
   const [readMinutes, setReadMinutes] = useState(5);
   const [publishedAt, setPublishedAt] = useState(() => new Date().toISOString().slice(0, 10));
   const [featured, setFeatured] = useState(false);
@@ -462,9 +475,9 @@ function ArticlesEditor({
     setEditingOriginalSlug(undefined);
     setTitle("");
     setSlug("");
-    setCategory("Training Science");
-    setAuthor("Coach Daniel Reyes");
-    setAuthorRole("Head Coach & Performance Director");
+    setCategory("Training");
+    setAuthor("");
+    setAuthorRole("");
     setReadMinutes(5);
     setPublishedAt(new Date().toISOString().slice(0, 10));
     setFeatured(false);
@@ -483,7 +496,7 @@ function ArticlesEditor({
     setSlug(a.slug);
     setCategory(
       (ARTICLE_CATEGORIES.find((c) => c === a.category) ??
-        "Training Science") as (typeof ARTICLE_CATEGORIES)[number],
+        "Training") as (typeof ARTICLE_CATEGORIES)[number],
     );
     setAuthor(a.author);
     setAuthorRole(a.author_role);
@@ -562,11 +575,13 @@ function ArticlesEditor({
               )}
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-brand-amber">
                     {a.category} {a.featured ? "· Lead Story" : ""}
                   </p>
-                  <h3 className="mt-1 text-base font-medium text-foreground">{a.title}</h3>
+                  <h3 className="mt-1 break-words text-base font-medium text-foreground">
+                    {a.title}
+                  </h3>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {a.published_at} · {a.author}
                   </p>
@@ -658,7 +673,13 @@ function ArticlesEditor({
           </div>
           <div className="space-y-2">
             <Label htmlFor="art-author">Author</Label>
-            <Input id="art-author" value={author} onChange={(e) => setAuthor(e.target.value)} />
+            <Input
+              id="art-author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="Author or research team"
+              required
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="art-role">Author Role</Label>
@@ -666,6 +687,8 @@ function ArticlesEditor({
               id="art-role"
               value={authorRole}
               onChange={(e) => setAuthorRole(e.target.value)}
+              placeholder="Credentials or role"
+              required
             />
           </div>
           <div className="space-y-2">
@@ -690,7 +713,7 @@ function ArticlesEditor({
           </div>
         </div>
 
-        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
+        <label className="flex min-h-11 cursor-pointer items-center gap-2.5 text-sm text-foreground">
           <input
             type="checkbox"
             checked={featured}
@@ -835,7 +858,7 @@ function NewslettersEditor({
   onDelete: (id: string) => Promise<void>;
 }) {
   const [editingId, setEditingId] = useState<string | undefined>(undefined);
-  const [issueNumber, setIssueNumber] = useState((newsletters[0]?.issue_number ?? 14) + 1);
+  const [issueNumber, setIssueNumber] = useState((newsletters[0]?.issue_number ?? 0) + 1);
   const [title, setTitle] = useState("");
   const [publishedAt, setPublishedAt] = useState(() => new Date().toISOString().slice(0, 10));
   const [summary, setSummary] = useState("");
@@ -845,7 +868,7 @@ function NewslettersEditor({
 
   function resetForm() {
     setEditingId(undefined);
-    setIssueNumber((newsletters[0]?.issue_number ?? 14) + 1);
+    setIssueNumber((newsletters[0]?.issue_number ?? 0) + 1);
     setTitle("");
     setPublishedAt(new Date().toISOString().slice(0, 10));
     setSummary("");
@@ -914,11 +937,13 @@ function NewslettersEditor({
               )}
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-brand-amber">
                     Issue #{nl.issue_number} · {nl.published_at}
                   </p>
-                  <h3 className="mt-1 text-base font-medium text-foreground">{nl.title}</h3>
+                  <h3 className="mt-1 break-words text-base font-medium text-foreground">
+                    {nl.title}
+                  </h3>
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
                   <Button type="button" variant="ghost" size="sm" onClick={() => loadForEdit(nl)}>
@@ -980,7 +1005,7 @@ function NewslettersEditor({
               id="nl-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Dusk Dispatch #15:..."
+              placeholder="Auctus Performance Brief #1:..."
               required
             />
           </div>
@@ -1166,12 +1191,14 @@ function NutritionEditor({
               )}
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-brand-amber">
                     {item.group}
                     {item.subgroup ? ` · ${item.subgroup}` : ""}
                   </p>
-                  <h3 className="mt-1 text-base font-medium text-foreground">{item.name}</h3>
+                  <h3 className="mt-1 break-words text-base font-medium text-foreground">
+                    {item.name}
+                  </h3>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {item.performanceOneLiner}
                   </p>
@@ -1332,13 +1359,6 @@ function NutritionEditor({
           </div>
         </div>
 
-        <TagToggleGroup
-          label="Age Bracket Highlights"
-          options={AGE_GROUPS}
-          selected={ageGroups}
-          onChange={(next) => setAgeGroups(next as AgeGroup[])}
-        />
-
         <Button type="submit" variant="hero" size="xl" className="w-full" disabled={saving}>
           {saving && <Loader2 className="animate-spin" aria-hidden="true" />}
           {editingId ? "Save Nutrient Changes" : "Publish Nutrient"}
@@ -1375,7 +1395,7 @@ function TagToggleGroup({
                 onChange(active ? selected.filter((item) => item !== opt) : [...selected, opt])
               }
               className={cn(
-                "inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 py-1 text-xs transition-colors",
+                "inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs transition-colors",
                 active
                   ? "border-brand-amber/60 bg-background text-foreground"
                   : "border-border text-muted-foreground hover:text-foreground",

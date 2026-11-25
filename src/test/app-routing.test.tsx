@@ -15,8 +15,10 @@ describe("App routing", () => {
     for (const path of [
       "/",
       "/about",
+      "/training",
       "/nutrition",
       "/articles",
+      "/submit",
       "/pricing",
       "/contact",
       "/admin",

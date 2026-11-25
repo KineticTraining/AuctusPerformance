@@ -9,12 +9,12 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * DUSK KINETIC PERFORMANCE design system
- * Deep twilight slate surfaces paired with warm amber, burnt orange, deep crimson, and indigo sunset accents.
+ * AUCTUS PERFORMANCE design system
+ * Deep twilight slate surfaces paired with warm amber, burnt orange, deep crimson, and indigo accents.
  */
 
 @theme inline {
-  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
@@ -99,21 +99,21 @@
   --success: oklch(0.75 0.14 160);
   --warning: oklch(0.8 0.16 70);
 
-  /* Sunset Palette: Warm Amber · Burnt Orange · Sunset Coral · Twilight Indigo */
-  --brand-amber: oklch(0.81 0.165 74);
-  --brand-orange: oklch(0.7 0.195 44);
-  --brand-coral: oklch(0.68 0.195 28);
-  --brand-red: oklch(0.62 0.215 24);
-  --brand-blue: oklch(0.78 0.165 65);
-  --brand-indigo: oklch(0.58 0.175 282);
+  /* Vibrant Athletic Palette: Warm Amber · Sunset Orange · Electric Coral · Twilight Indigo */
+  --brand-amber: oklch(0.83 0.175 76);
+  --brand-orange: oklch(0.72 0.21 44);
+  --brand-coral: oklch(0.69 0.22 24);
+  --brand-red: oklch(0.64 0.23 20);
+  --brand-blue: oklch(0.79 0.175 65);
+  --brand-indigo: oklch(0.62 0.195 286);
 
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.18 52 / 75%);
-  --chart-1: oklch(0.81 0.165 74);
-  --chart-2: oklch(0.7 0.195 44);
-  --chart-3: oklch(0.68 0.195 28);
-  --chart-4: oklch(0.58 0.175 282);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.74 0.195 48 / 80%);
+  --chart-1: oklch(0.83 0.175 76);
+  --chart-2: oklch(0.72 0.21 44);
+  --chart-3: oklch(0.69 0.22 24);
+  --chart-4: oklch(0.62 0.195 286);
   --chart-5: oklch(0.76 0.015 275);
   --sidebar: oklch(0.15 0.022 275);
   --sidebar-foreground: oklch(0.98 0.005 70);
@@ -122,7 +122,7 @@
   --sidebar-accent: oklch(0.22 0.028 275);
   --sidebar-accent-foreground: oklch(0.98 0.005 70);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.18 52 / 75%);
+  --sidebar-ring: oklch(0.74 0.195 48 / 80%);
 
   --gradient-accent: linear-gradient(
     105deg,
@@ -131,29 +131,30 @@
     var(--brand-coral)
   );
   --gradient-sunset: linear-gradient(
-    125deg,
+    120deg,
     var(--brand-amber) 0%,
-    var(--brand-orange) 36%,
-    var(--brand-coral) 72%,
+    var(--brand-orange) 34%,
+    var(--brand-coral) 68%,
     var(--brand-indigo) 100%
   );
   --gradient-tricolor: linear-gradient(
     90deg,
     var(--brand-amber) 0%,
-    var(--brand-orange) 36%,
-    var(--brand-coral) 72%,
+    var(--brand-orange) 34%,
+    var(--brand-coral) 68%,
     var(--brand-indigo) 100%
   );
   --gradient-fade-left: linear-gradient(
     90deg,
     oklch(0.11 0.025 275 / 92%) 0%,
-    oklch(0.13 0.025 275 / 68%) 42%,
-    transparent 78%
+    oklch(0.13 0.025 275 / 64%) 46%,
+    transparent 82%
   );
   --gradient-tint: linear-gradient(
-    180deg,
-    oklch(0.13 0.025 275 / 35%) 0%,
-    oklch(0.13 0.025 275 / 88%) 100%
+    135deg,
+    oklch(0.14 0.03 275 / 62%) 0%,
+    oklch(0.2 0.06 28 / 48%) 55%,
+    oklch(0.13 0.03 282 / 86%) 100%
   );
   --gradient-fade-up: linear-gradient(
     0deg,
@@ -162,8 +163,8 @@
     transparent 75%
   );
   --gradient-card: linear-gradient(180deg, var(--surface), var(--surface));
-  --shadow-accent: 0 12px 36px -12px color-mix(in oklab, var(--brand-orange) 50%, transparent);
-  --shadow-card: 0 1px 0 0 oklch(1 0 0 / 4%) inset;
+  --shadow-accent: 0 12px 36px -12px color-mix(in oklab, var(--brand-orange) 55%, transparent);
+  --shadow-card: 0 1px 0 0 oklch(1 0 0 / 5%) inset;
 }
 
 @layer base {

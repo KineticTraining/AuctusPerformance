@@ -33,7 +33,7 @@ export const Route = createFileRoute("/auth_/callback")({
   }),
   head: () => ({
     meta: [
-      { title: "Completing Sign-In — Dusk Kinetic Performance" },
+      { title: "Completing Sign-In — Auctus Performance" },
       { name: "robots", content: "noindex" },
     ],
   }),

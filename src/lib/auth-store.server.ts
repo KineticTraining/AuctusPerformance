@@ -94,8 +94,8 @@ type AuthStoreState = {
   exchangeCodes: Record<string, ExchangeRecord>;
 };
 
-const STORE_GLOBAL_KEY = "__dusk_kinetic_auth_store__";
-const SECRET_GLOBAL_KEY = "__dusk_kinetic_auth_runtime_secret__";
+const STORE_GLOBAL_KEY = "__auctus_performance_auth_store__";
+const SECRET_GLOBAL_KEY = "__auctus_performance_auth_runtime_secret__";
 const g = globalThis as unknown as Record<string, unknown>;
 
 function getStorePath(): string {
@@ -111,7 +111,7 @@ function getRuntimeSecret(): Buffer {
     readEnvFallback("SUPABASE_SERVICE_ROLE_KEY") ??
     readEnvFallback("GOOGLE_CLIENT_SECRET");
   const secret = configured
-    ? createHash("sha256").update(`dusk-auth:${configured}`).digest()
+    ? createHash("sha256").update(`auctus-auth:${configured}`).digest()
     : randomBytes(32);
   g[SECRET_GLOBAL_KEY] = secret;
   return secret;

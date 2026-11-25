@@ -12,13 +12,13 @@ export const Route = createFileRoute("/membership")({
   }),
   head: () => ({
     meta: [
-      { title: "Membership & Billing — Kinetic" },
+      { title: "Membership & Billing — Auctus Performance" },
       {
         name: "description",
-        content: "Upgrade your Kinetic membership or manage billing via Stripe.",
+        content: "Upgrade your Auctus Performance membership or manage billing via Stripe.",
       },
-      { property: "og:title", content: "Membership & Billing — Kinetic" },
-      { property: "og:description", content: "Choose a Kinetic training membership plan." },
+      { property: "og:title", content: "Membership & Billing — Auctus Performance" },
+      { property: "og:description", content: "Choose an Auctus Performance membership plan." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

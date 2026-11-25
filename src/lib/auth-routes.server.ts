@@ -136,7 +136,7 @@ function renderPopupCallbackHtml(
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>${escapeHtml(heading)} — Dusk Kinetic</title>
+    <title>${escapeHtml(heading)} — Auctus Performance</title>
     <style>
       body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0a0b0f;color:#f4f4f6;font-family:system-ui,-apple-system,sans-serif;padding:24px;text-align:center}
       .card{max-width:380px;background:#12141c;border:1px solid #262936;border-radius:16px;padding:28px}
@@ -303,7 +303,7 @@ export async function handleAuthApiRequest(request: Request): Promise<Response |
         { type: "GOOGLE_OAUTH_ERROR", error: "Google sign-in was canceled or denied." },
         "/auth?oauth_error=canceled",
         "Sign-in canceled",
-        "You can close this window and return to Dusk Kinetic.",
+        "You can close this window and return to Auctus Performance.",
       );
     }
 
@@ -396,7 +396,7 @@ export async function handleAuthApiRequest(request: Request): Promise<Response |
         { type: "GOOGLE_OAUTH_SUCCESS", code: exchangeCode },
         `/auth?oauth_code=${encodeURIComponent(exchangeCode)}`,
         "Google account connected",
-        "Completing sign-in and returning you to Dusk Kinetic...",
+        "Completing sign-in and returning you to Auctus Performance...",
       );
     } catch (err) {
       console.error("[Google OAuth Callback Error]", err);

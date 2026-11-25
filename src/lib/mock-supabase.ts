@@ -14,7 +14,7 @@ type SubmissionRow = Database["public"]["Tables"]["submissions"]["Row"];
 
 const SESSION_STORAGE_KEY = "kinetic_mock_session";
 const USERS_STORAGE_KEY = "kinetic_mock_users";
-const RECOVERY_STORAGE_KEY = "dusk_mock_recovery";
+const RECOVERY_STORAGE_KEY = "auctus_mock_recovery";
 
 type StoredUser = {
   id: string;
@@ -704,7 +704,7 @@ export function createMockSupabaseClient(fixedUserId?: string): SupabaseClient<D
         const id = "00000000-0000-4000-8000-000000000001";
         const user = buildUser({
           id,
-          email: "demo@duskkinetic.com",
+          email: "demo@auctusperformance.com",
           display_name: "Jordan Ellis",
           sport: "Basketball",
           level: "Intermediate",
@@ -784,7 +784,7 @@ export function createMockSupabaseClient(fixedUserId?: string): SupabaseClient<D
         const meta = (claims?.["user_metadata"] ?? {}) as Record<string, unknown>;
         const user = buildUser({
           id: claims?.sub ?? "00000000-0000-4000-8000-000000000001",
-          email: claims?.email ?? "demo@duskkinetic.com",
+          email: claims?.email ?? "demo@auctusperformance.com",
           ...(typeof meta["display_name"] === "string"
             ? { display_name: meta["display_name"] }
             : {}),

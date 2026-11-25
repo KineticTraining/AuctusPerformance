@@ -11,6 +11,7 @@ import {
   type NewsletterIssue,
   type NutritionEntry,
 } from "./mock-seed";
+import { normalizeArticleCategory } from "./sports";
 
 export type CmsState = {
   articles: ArticleSeedRow[];
@@ -18,14 +19,38 @@ export type CmsState = {
   nutrition: NutritionEntry[];
 };
 
-const CMS_GLOBAL_KEY = "__dusk_kinetic_cms_store__";
-const SECRET_GLOBAL_KEY = "__dusk_kinetic_admin_hmac_secret__";
-const HASH_GLOBAL_KEY = "__dusk_kinetic_admin_claimed_hash__";
+const CMS_GLOBAL_KEY = "__auctus_performance_cms_store__";
+const SECRET_GLOBAL_KEY = "__auctus_performance_admin_hmac_secret__";
+const HASH_GLOBAL_KEY = "__auctus_performance_admin_claimed_hash__";
+
+export const LEGACY_FABRICATED_ARTICLE_SLUGS = new Set([
+  "sleep-the-performance-drug",
+  "rate-of-force-development",
+  "hamstring-injury-prevention",
+  "fueling-for-training",
+  "mental-rehearsal",
+  "training-load-acwr",
+]);
+
+export const LEGACY_FABRICATED_NEWSLETTER_IDS = new Set(["nl-012", "nl-013", "nl-014"]);
 
 const g = globalThis as unknown as Record<string, unknown>;
 
 function dataPath(filename: string): string {
   return resolve(process.cwd(), ".data", filename);
+}
+
+export function sanitizeCmsArticles(articles: ArticleSeedRow[]): ArticleSeedRow[] {
+  return articles
+    .filter((a) => !LEGACY_FABRICATED_ARTICLE_SLUGS.has(a.slug))
+    .map((a) => ({
+      ...a,
+      category: normalizeArticleCategory(a.category),
+    }));
+}
+
+export function sanitizeCmsNewsletters(newsletters: NewsletterIssue[]): NewsletterIssue[] {
+  return newsletters.filter((n) => !LEGACY_FABRICATED_NEWSLETTER_IDS.has(n.id));
 }
 
 function readPersistedCms(): CmsState | null {
@@ -48,9 +73,12 @@ function readPersistedCms(): CmsState | null {
       typeof firstNut["summarized"] !== "object" ||
       typeof firstNut["inDepth"] !== "object";
 
+    const cleanArticles = sanitizeCmsArticles(parsed.articles);
+    const cleanNewsletters = sanitizeCmsNewsletters(parsed.newsletters);
+
     return {
-      articles: parsed.articles,
-      newsletters: parsed.newsletters,
+      articles: cleanArticles,
+      newsletters: cleanNewsletters,
       nutrition: isLegacyNutrition ? structuredClone(SEED_NUTRITION) : parsed.nutrition,
     };
   } catch {
@@ -182,7 +210,7 @@ function getAdminHmacSecret(): string {
     readEnvFallback("ADMIN_ACCESS_KEY") ??
     readEnvFallback("STRIPE_SECRET_KEY");
   const secret = configured
-    ? createHash("sha256").update(`dusk-admin:${configured}`).digest("hex")
+    ? createHash("sha256").update(`auctus-admin:${configured}`).digest("hex")
     : randomBytes(32).toString("hex");
   g[SECRET_GLOBAL_KEY] = secret;
   return secret;

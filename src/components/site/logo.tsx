@@ -3,8 +3,7 @@ import { useId } from "react";
 
 export function LogoMark({ className = "size-8" }: { className?: string }) {
   const uid = useId().replace(/:/g, "");
-  const arcId = `dk-arc-${uid}`;
-  const horizonId = `dk-horizon-${uid}`;
+  const curveId = `auctus-curve-${uid}`;
 
   return (
     <svg
@@ -15,56 +14,36 @@ export function LogoMark({ className = "size-8" }: { className?: string }) {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id={arcId} x1="6" y1="24" x2="30" y2="6" gradientUnits="userSpaceOnUse">
+        <linearGradient id={curveId} x1="6" y1="26" x2="30" y2="9" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#F59E0B" />
-          <stop offset="52%" stopColor="#EA580C" />
-          <stop offset="100%" stopColor="#FB7185" />
-        </linearGradient>
-        <linearGradient
-          id={horizonId}
-          x1="5"
-          y1="27"
-          x2="31"
-          y2="27"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0%" stopColor="#F59E0B" />
-          <stop offset="60%" stopColor="#FB7185" />
+          <stop offset="55%" stopColor="#EA580C" />
           <stop offset="100%" stopColor="#818CF8" />
         </linearGradient>
       </defs>
-      <rect x="1" y="1" width="34" height="34" rx="9" fill="currentColor" fillOpacity="0.04" />
       <rect
-        x="1"
-        y="1"
-        width="34"
-        height="34"
-        rx="9"
-        stroke="url(#dk-arc-fallback)"
-        strokeOpacity="0"
-      />
-      {/* Golden-hour horizon arc */}
-      <path
-        d="M7.5 22.5a10.5 10.5 0 0 1 21 0"
-        stroke={`url(#${arcId})`}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-      {/* Forward kinetic stride / force-time vector */}
-      <path
-        d="M11 22.5L16.8 11.8L20.8 18.6L26.5 10.5"
+        x="1.25"
+        y="1.25"
+        width="33.5"
+        height="33.5"
+        rx="8.5"
+        fill="currentColor"
+        fillOpacity="0.03"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeOpacity="0.14"
+        strokeWidth="1"
+      />
+      {/* Crisp geometric apex "A" */}
+      <path
+        d="M9.5 26.5L18 8.5L26.5 26.5"
+        stroke="currentColor"
+        strokeWidth="2.1"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Twilight horizon baseline */}
-      <line
-        x1="6.5"
-        y1="27"
-        x2="29.5"
-        y2="27"
-        stroke={`url(#${horizonId})`}
+      {/* Ascending force-time kinetic curve intersecting the apex */}
+      <path
+        d="M6.5 23.5C11.5 23.5 14 17.2 18.2 17.2C22.4 17.2 25.2 12.6 29.5 10.5"
+        stroke={`url(#${curveId})`}
         strokeWidth="2"
         strokeLinecap="round"
       />
@@ -77,11 +56,11 @@ export function Logo() {
     <Link
       to="/"
       className="group flex shrink-0 items-center gap-2.5 whitespace-nowrap"
-      aria-label="Dusk Kinetic Performance home"
+      aria-label="Auctus Performance home"
     >
       <LogoMark className="size-8 text-foreground transition-transform duration-200 group-hover:scale-[1.03]" />
       <span className="font-display text-base font-semibold tracking-tight text-foreground sm:text-lg">
-        Dusk <span className="text-sunset">Kinetic</span>
+        Auctus <span className="text-sunset">Performance</span>
       </span>
     </Link>
   );

@@ -90,7 +90,7 @@ export const PRICING_TIERS: PricingTier[] = [
     kind: "membership",
     features: [
       "Unlimited sport filters across every discipline",
-      "Complete Dusk Kinetic Training Library & Nutrition Hub",
+      "Complete Auctus Performance Training Library & Nutrition Hub",
       "Unlimited AI technique video reviews every month",
       "Priority processing on every submitted clip",
     ],
@@ -161,7 +161,7 @@ export const NUTRITION_STORE_PACKAGES: PricingTier[] = [
       "8-week periodized training + nutrition progression",
       "Weekly coach film review + biometric load adjustments",
       "Phase 1 Baseline -> Phase 2 Power -> Phase 3 Peak Taper",
-      "Full Dusk Kinetic platform access throughout the cohort",
+      "Full Auctus Performance platform access throughout the cohort",
     ],
   },
   {
@@ -179,7 +179,7 @@ export const NUTRITION_STORE_PACKAGES: PricingTier[] = [
     envPriceIdKey: "STRIPE_PRICE_ID_NUTRITION_COACHING",
     kind: "nutrition_program",
     features: [
-      "Bi-weekly 1-on-1 adjustments with Priya Shah, RD, CSSD",
+      "Bi-weekly 1-on-1 adjustments with a Certified Sports Dietitian (RD, CSSD)",
       "Blood-panel & micronutrient sufficiency review guide",
       "Supplement safety check (NSF Certified for Sport)",
       "Direct support chat & recovery fueling audits",

@@ -18,11 +18,11 @@ function AdminRouteComponent() {
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Studio — Dusk Kinetic Performance" },
+      { title: "Admin Studio — Auctus Performance" },
       {
         name: "description",
         content:
-          "Private content management studio for Dusk Kinetic Performance news, research articles, newsletters, and nutrition protocols.",
+          "Private content management studio for Auctus Performance news, research articles, newsletters, and nutrition protocols.",
       },
       { name: "robots", content: "noindex" },
     ],

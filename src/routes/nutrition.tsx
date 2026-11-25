@@ -17,6 +17,9 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { NutrientPriorityPanel } from "@/components/nutrition/nutrient-priority-panel";
+import { AthleticImage } from "@/components/site/athletic-image";
+import { PageWithOutline, type OutlineSection } from "@/components/site/page-outline";
 import { NutritionSkeleton } from "@/components/site/page-skeletons";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,15 +39,10 @@ import {
 } from "@/lib/billing.functions";
 import { SITE_MEDIA } from "@/lib/media";
 import type { NutrientEntry } from "@/lib/mock-seed";
+import { getNutrientPriority } from "@/lib/nutrition-data";
 import { nutritionListQuery } from "@/lib/nutrition.functions";
 import { NUTRITION_STORE_PACKAGES, type PlanId } from "@/lib/plans";
-import {
-  AGE_GROUPS,
-  NUTRITION_GROUPS,
-  matchesAgeFilter,
-  type AgeGroup,
-  type NutritionGroup,
-} from "@/lib/sports";
+import { NUTRITION_GROUPS, type NutritionGroup } from "@/lib/sports";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/nutrition")({
@@ -57,17 +55,17 @@ export const Route = createFileRoute("/nutrition")({
   }),
   head: () => ({
     meta: [
-      { title: "Nutrition Guide & 6–8 Week Program — Dusk Kinetic Performance" },
+      { title: "Nutrition Guide & Program — Auctus Performance" },
       {
         name: "description",
         content:
-          "Age-tailored athlete nutrition guide covering macronutrients, vitamins, macrominerals, and trace minerals alongside our 6–8 Week Health & Performance Program.",
+          "Verified athletic nutrition guide covering macronutrients, vitamins, macrominerals, and trace minerals with interactive priority cues alongside our 6–8 Week Health & Performance Program.",
       },
-      { property: "og:title", content: "Nutrition Guide — Dusk Kinetic Performance" },
+      { property: "og:title", content: "Nutrition Guide — Auctus Performance" },
       {
         property: "og:description",
         content:
-          "Clear summarized and in-depth biochemical reference for all 26 core nutrients, filtered by age bracket.",
+          "Summarized and in-depth biochemical reference for 26 core nutrients with priority cues.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -102,6 +100,13 @@ const GROUP_DESCRIPTIONS: Record<NutritionGroup, { subtitle: string; detail: str
   },
 };
 
+const NUTRITION_OUTLINE: OutlineSection[] = [
+  { id: "nutrition-overview", label: "Overview" },
+  { id: "nutrient-guide", label: "Nutrient Guide" },
+  { id: "flagship-program", label: "6–8 Week Program" },
+  { id: "nutrition-packages", label: "Packages" },
+];
+
 const PROGRAM_PHASES = [
   {
     phase: "Weeks 1–2 · Foundation & Fueling Baseline",
@@ -109,7 +114,7 @@ const PROGRAM_PHASES = [
     deliverables: [
       "Audit daily protein distribution & sweat-rate hydration baseline",
       "Establish 3x/week hinge, squat & ankle stiffness mechanics before heavy intensity",
-      "Capture baseline sprint or court skill clip for coach feedback",
+      "Capture baseline sprint or court skill clip for analysis",
     ],
   },
   {
@@ -150,20 +155,27 @@ function NutritionPage() {
     enabled: ready && Boolean(session),
   });
 
-  // Age Filter ONLY on Nutrition
-  const [ageGroup, setAgeGroup] = useState<string>("All");
   const [expandedGroups, setExpandedGroups] = useState<Record<NutritionGroup, boolean>>({
     Macronutrients: true,
     Vitamins: false,
     Macrominerals: false,
     "Trace Minerals": false,
   });
+  const [inspectedNutrient, setInspectedNutrient] = useState<NutrientEntry | null>(
+    () => nutrients[0] ?? null,
+  );
   const [selectedNutrient, setSelectedNutrient] = useState<NutrientEntry | null>(null);
   const [detailTab, setDetailTab] = useState<"summarized" | "indepth">("summarized");
 
   const [busyPlan, setBusyPlan] = useState<PlanId | null>(null);
   const [externalUrl, setExternalUrl] = useState<{ label: string; url: string } | null>(null);
   const [verifiedSessionId, setVerifiedSessionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!inspectedNutrient && nutrients.length > 0) {
+      setInspectedNutrient(nutrients[0] ?? null);
+    }
+  }, [nutrients, inspectedNutrient]);
 
   useEffect(() => {
     if (canceled) {
@@ -177,7 +189,9 @@ function NutritionPage() {
     confirmCheckout({ data: { sessionId } })
       .then((res) => {
         queryClient.setQueryData(["billing-status", session.user.id], res);
-        toast.success("Enrollment confirmed — welcome to the Dusk Kinetic Nutrition Program.");
+        toast.success(
+          "Enrollment confirmed — welcome to the Auctus Performance Nutrition Program.",
+        );
         navigate({
           to: "/nutrition",
           search: { session_id: undefined, canceled: undefined },
@@ -189,18 +203,13 @@ function NutritionPage() {
       });
   }, [ready, session, sessionId, verifiedSessionId, confirmCheckout, queryClient, navigate]);
 
-  const filteredNutrients = useMemo(
-    () => nutrients.filter((n) => matchesAgeFilter(n.ageGroups, ageGroup)),
-    [nutrients, ageGroup],
-  );
-
   const groupedNutrients = useMemo(() => {
     const map = new Map<
       NutritionGroup,
       { items: NutrientEntry[]; fatSoluble: NutrientEntry[]; waterSoluble: NutrientEntry[] }
     >();
     for (const group of NUTRITION_GROUPS) {
-      const items = filteredNutrients.filter((n) => n.group === group);
+      const items = nutrients.filter((n) => n.group === group);
       map.set(group, {
         items,
         fatSoluble: group === "Vitamins" ? items.filter((i) => i.subgroup === "Fat-Soluble") : [],
@@ -208,7 +217,7 @@ function NutritionPage() {
       });
     }
     return map;
-  }, [filteredNutrients]);
+  }, [nutrients]);
 
   const allExpanded = NUTRITION_GROUPS.every((g) => expandedGroups[g]);
 
@@ -227,6 +236,7 @@ function NutritionPage() {
   }
 
   function openNutrientModal(nutrient: NutrientEntry) {
+    setInspectedNutrient(nutrient);
     setSelectedNutrient(nutrient);
     setDetailTab("summarized");
   }
@@ -245,6 +255,12 @@ function NutritionPage() {
   }
 
   async function handleEnroll(plan: PlanId) {
+    if (!configured) {
+      toast.info(
+        "This package is shown in preview/demo mode — use Book Consultation for coaching inquiries.",
+      );
+      return;
+    }
     if (!session) {
       navigate({ to: "/auth", search: { mode: "signup" } });
       return;
@@ -267,10 +283,13 @@ function NutritionPage() {
   const configured = catalogQuery.data?.configured ?? false;
 
   return (
-    <div>
+    <PageWithOutline sections={NUTRITION_OUTLINE} title="Nutrition">
       {/* HERO */}
-      <section className="relative isolate overflow-hidden border-b border-border/60">
-        <img
+      <section
+        id="nutrition-overview"
+        className="scroll-mt-24 relative isolate overflow-hidden rounded-2xl border border-border/60 sm:rounded-3xl"
+      >
+        <AthleticImage
           src={SITE_MEDIA.nutritionBowl.src}
           alt={SITE_MEDIA.nutritionBowl.alt}
           width={SITE_MEDIA.nutritionBowl.width}
@@ -281,203 +300,157 @@ function NutritionPage() {
         <div className="absolute inset-0 -z-10 bg-fade-left" />
         <div className="absolute inset-0 -z-10 bg-fade-up" />
 
-        <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
+        <div className="px-6 py-14 sm:px-10 sm:py-20">
           <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
-          <p className="eyebrow mt-6 text-brand-amber">Nutrition Reference &amp; Coaching</p>
-          <h1 className="text-display mt-4 max-w-4xl text-4xl sm:text-6xl md:text-7xl">
+          <p className="eyebrow mt-5 text-brand-amber">Nutrition Reference</p>
+          <h1 className="text-display mt-3 max-w-3xl text-4xl sm:text-6xl">
             Every essential nutrient. <span className="text-sunset">Clearly explained.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-lg font-light text-foreground/85">
-            Browse macronutrients, vitamins, macrominerals, and trace minerals by age group. Click
-            any nutrient for both an everyday summary and full biochemical depth.
+          <p className="mt-4 max-w-xl text-base font-light text-foreground/85 sm:text-lg">
+            26 macronutrients, vitamins, and minerals with priority tiers.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild variant="hero" size="xl" className="min-h-12">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button asChild variant="hero" size="xl" className="min-h-12 w-full sm:w-auto">
               <a href="#nutrient-guide">
-                Browse Nutrient Guide <ArrowRight aria-hidden="true" />
+                Nutrient Guide <ArrowRight aria-hidden="true" />
               </a>
             </Button>
-            <Button asChild variant="glass" size="xl" className="min-h-12">
-              <a href="#flagship-program">6–8 Week Performance Program</a>
+            <Button asChild variant="glass" size="xl" className="min-h-12 w-full sm:w-auto">
+              <a href="#flagship-program">6–8 Week Program</a>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* CLEAN NUTRIENT GUIDE WITH AGE FILTER ONLY */}
-      <section id="nutrient-guide" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-20">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      {/* NUTRIENT GUIDE + DYNAMIC PRIORITY INSPECTOR */}
+      <section id="nutrient-guide" className="scroll-mt-24 py-14 sm:py-16">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="eyebrow text-brand-amber">Open-Access Nutrient Guide</p>
-            <h2 className="text-display mt-3 text-4xl md:text-5xl">
+            <p className="eyebrow text-brand-amber">Nutrient Reference</p>
+            <h2 className="text-display mt-2.5 text-3xl sm:text-4xl">
               Macronutrients, Vitamins &amp; Minerals
             </h2>
-            <p className="mt-2 max-w-xl text-sm font-light text-muted-foreground">
-              Open a category box below and select any nutrient to view its summarized guide or
-              in-depth biochemical profile.
-            </p>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="font-mono tabular-nums">
-              Showing {filteredNutrients.length} of {nutrients.length} nutrients
-            </span>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+            <span className="font-mono tabular-nums">{nutrients.length} verified nutrients</span>
             <button
               type="button"
               onClick={toggleExpandAll}
-              className="font-mono uppercase tracking-[0.14em] text-brand-amber underline underline-offset-4 hover:text-foreground"
+              className="inline-flex min-h-11 items-center font-mono uppercase tracking-[0.14em] text-brand-amber underline underline-offset-4 hover:text-foreground"
             >
               {allExpanded ? "Collapse all" : "Expand all"}
             </button>
           </div>
         </div>
 
-        {/* AGE FILTER ONLY */}
-        <div className="mt-8 rounded-2xl border border-border bg-surface p-5">
-          <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground">
-            Filter by Age Group
-          </p>
-          <div
-            role="radiogroup"
-            aria-label="Filter nutrients by age group"
-            className="mt-3 flex flex-wrap gap-2"
-          >
-            <button
-              type="button"
-              role="radio"
-              aria-checked={ageGroup === "All"}
-              onClick={() => setAgeGroup("All")}
-              className={cn(
-                "min-h-10 rounded-full border px-4 py-1.5 text-sm whitespace-nowrap transition-colors",
-                ageGroup === "All"
-                  ? "border-brand-amber bg-primary text-primary-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground",
-              )}
-            >
-              All Ages
-            </button>
-            {AGE_GROUPS.map((ag) => (
-              <button
-                key={ag}
-                type="button"
-                role="radio"
-                aria-checked={ageGroup === ag}
-                onClick={() => setAgeGroup(ag)}
-                className={cn(
-                  "min-h-10 rounded-full border px-4 py-1.5 text-sm whitespace-nowrap transition-colors",
-                  ageGroup === ag
-                    ? "border-brand-amber bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {ag}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* 2-Column Split: 4 Expandable Groups + Sticky Priority Graphic */}
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1.25fr_0.9fr] lg:items-start">
+          <div className="space-y-4">
+            {NUTRITION_GROUPS.map((group) => {
+              const bucket = groupedNutrients.get(group);
+              const items = bucket?.items ?? [];
+              const isOpen = expandedGroups[group];
+              const meta = GROUP_DESCRIPTIONS[group];
+              const fatSoluble = bucket?.fatSoluble ?? [];
+              const waterSoluble = bucket?.waterSoluble ?? [];
 
-        {/* 4 CLEAN EXPANDABLE NUTRIENT BOXES */}
-        <div className="mt-8 space-y-4">
-          {NUTRITION_GROUPS.map((group) => {
-            const bucket = groupedNutrients.get(group);
-            const items = bucket?.items ?? [];
-            const isOpen = expandedGroups[group];
-            const meta = GROUP_DESCRIPTIONS[group];
-            const fatSoluble = bucket?.fatSoluble ?? [];
-            const waterSoluble = bucket?.waterSoluble ?? [];
-
-            return (
-              <section
-                key={group}
-                className="overflow-hidden rounded-2xl border border-border bg-surface"
-              >
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  onClick={() => toggleGroup(group)}
-                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-background/40"
+              return (
+                <section
+                  key={group}
+                  className="overflow-hidden rounded-2xl border border-border bg-surface"
                 >
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="text-display text-2xl text-foreground sm:text-3xl">{group}</h3>
-                      <span className="font-mono text-xs text-brand-amber tabular-nums">
-                        {items.length} {items.length === 1 ? "item" : "items"}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm font-light text-muted-foreground">
-                      {meta.subtitle} · {meta.detail}
-                    </p>
-                  </div>
-                  <span className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground">
-                    {isOpen ? (
-                      <ChevronDown className="size-4" aria-hidden="true" />
-                    ) : (
-                      <ChevronRight className="size-4" aria-hidden="true" />
-                    )}
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="border-t border-border/70 px-6 pb-6 pt-4">
-                    {items.length === 0 ? (
-                      <p className="py-4 text-sm text-muted-foreground">
-                        No nutrients prioritized specifically for {ageGroup} in this group. Switch
-                        to All Ages to inspect the full list.
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => toggleGroup(group)}
+                    className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-background/40 sm:px-6 sm:py-5"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="text-display text-2xl text-foreground sm:text-3xl">
+                          {group}
+                        </h3>
+                        <span className="font-mono text-xs text-brand-amber tabular-nums">
+                          {items.length} {items.length === 1 ? "item" : "items"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm font-light text-muted-foreground">
+                        {meta.subtitle} · {meta.detail}
                       </p>
-                    ) : group === "Vitamins" ? (
-                      <div className="space-y-6">
-                        {fatSoluble.length > 0 && (
-                          <div>
-                            <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-orange">
-                              Fat-Soluble Vitamins
-                            </p>
-                            <div className="grid gap-3 md:grid-cols-2">
-                              {fatSoluble.map((item) => (
-                                <NutrientRowCard
-                                  key={item.id}
-                                  nutrient={item}
-                                  selectedAge={ageGroup}
-                                  onOpen={openNutrientModal}
-                                />
-                              ))}
+                    </div>
+                    <span className="grid size-11 shrink-0 place-items-center rounded-full border border-border text-muted-foreground">
+                      {isOpen ? (
+                        <ChevronDown className="size-4" aria-hidden="true" />
+                      ) : (
+                        <ChevronRight className="size-4" aria-hidden="true" />
+                      )}
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="border-t border-border/70 px-5 pb-6 pt-5 sm:px-6">
+                      {group === "Vitamins" ? (
+                        <div className="space-y-6">
+                          {fatSoluble.length > 0 && (
+                            <div>
+                              <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-orange">
+                                Fat-Soluble Vitamins
+                              </p>
+                              <div className="grid gap-3 md:grid-cols-2">
+                                {fatSoluble.map((item) => (
+                                  <NutrientRowCard
+                                    key={item.id}
+                                    nutrient={item}
+                                    isInspected={inspectedNutrient?.id === item.id}
+                                    onInspect={setInspectedNutrient}
+                                    onOpen={openNutrientModal}
+                                  />
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        {waterSoluble.length > 0 && (
-                          <div>
-                            <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-amber">
-                              Water-Soluble: B-Complex &amp; Vitamin C
-                            </p>
-                            <div className="grid gap-3 md:grid-cols-2">
-                              {waterSoluble.map((item) => (
-                                <NutrientRowCard
-                                  key={item.id}
-                                  nutrient={item}
-                                  selectedAge={ageGroup}
-                                  onOpen={openNutrientModal}
-                                />
-                              ))}
+                          )}
+                          {waterSoluble.length > 0 && (
+                            <div>
+                              <p className="mb-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-amber">
+                                Water-Soluble: B-Complex &amp; Vitamin C
+                              </p>
+                              <div className="grid gap-3 md:grid-cols-2">
+                                {waterSoluble.map((item) => (
+                                  <NutrientRowCard
+                                    key={item.id}
+                                    nutrient={item}
+                                    isInspected={inspectedNutrient?.id === item.id}
+                                    onInspect={setInspectedNutrient}
+                                    onOpen={openNutrientModal}
+                                  />
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="grid gap-3 md:grid-cols-2">
-                        {items.map((item) => (
-                          <NutrientRowCard
-                            key={item.id}
-                            nutrient={item}
-                            selectedAge={ageGroup}
-                            onOpen={openNutrientModal}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
-            );
-          })}
+                          )}
+                        </div>
+                      ) : (
+                        <div className="grid gap-3 md:grid-cols-2">
+                          {items.map((item) => (
+                            <NutrientRowCard
+                              key={item.id}
+                              nutrient={item}
+                              isInspected={inspectedNutrient?.id === item.id}
+                              onInspect={setInspectedNutrient}
+                              onOpen={openNutrientModal}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+
+          {/* Sticky Dynamic Priority Panel */}
+          <NutrientPriorityPanel nutrient={inspectedNutrient} onOpenModal={openNutrientModal} />
         </div>
       </section>
 
@@ -486,15 +459,15 @@ function NutritionPage() {
         open={Boolean(selectedNutrient)}
         onOpenChange={(open) => !open && setSelectedNutrient(null)}
       >
-        <DialogContent className="max-h-[88vh] max-w-2xl overflow-y-auto bg-surface p-6 sm:p-8">
+        <DialogContent className="max-h-[88vh] max-w-2xl overflow-y-auto bg-surface p-5 sm:p-8">
           {selectedNutrient && (
             <>
-              <DialogHeader>
+              <DialogHeader className="pr-10 text-left">
                 <p className="eyebrow text-brand-amber">
                   {selectedNutrient.group}
                   {selectedNutrient.subgroup ? ` · ${selectedNutrient.subgroup}` : ""}
                 </p>
-                <DialogTitle className="text-display mt-1 text-3xl text-foreground sm:text-4xl">
+                <DialogTitle className="text-display mt-1 text-2xl text-foreground sm:text-4xl">
                   {selectedNutrient.name}
                 </DialogTitle>
                 <DialogDescription className="pt-1 text-sm font-normal leading-relaxed text-foreground/85">
@@ -507,9 +480,13 @@ function NutritionPage() {
                 onValueChange={(v) => setDetailTab(v as "summarized" | "indepth")}
                 className="mt-4"
               >
-                <TabsList className="grid w-full grid-cols-2 bg-background">
-                  <TabsTrigger value="summarized">Summarized Explanation</TabsTrigger>
-                  <TabsTrigger value="indepth">In-Depth Explanation</TabsTrigger>
+                <TabsList className="grid h-auto w-full grid-cols-1 gap-1 bg-background p-1 sm:grid-cols-2">
+                  <TabsTrigger value="summarized" className="min-h-11 text-sm">
+                    Summarized Explanation
+                  </TabsTrigger>
+                  <TabsTrigger value="indepth" className="min-h-11 text-sm">
+                    In-Depth Explanation
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="summarized" className="mt-5 space-y-4">
@@ -571,55 +548,34 @@ function NutritionPage() {
                   </div>
                 </TabsContent>
               </Tabs>
-
-              {selectedNutrient.ageGuidance &&
-                Object.keys(selectedNutrient.ageGuidance).length > 0 && (
-                  <div className="mt-4 rounded-xl border border-brand-amber/30 bg-background/50 p-4">
-                    <p className="font-mono text-[0.66rem] uppercase tracking-[0.14em] text-brand-amber">
-                      Age-Specific Notes
-                    </p>
-                    <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
-                      {(Object.entries(selectedNutrient.ageGuidance) as [AgeGroup, string][]).map(
-                        ([bracket, note]) => (
-                          <li
-                            key={bracket}
-                            className={cn(
-                              ageGroup === bracket ? "font-medium text-foreground" : "",
-                            )}
-                          >
-                            <span className="text-foreground/90">{bracket}:</span> {note}
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                  </div>
-                )}
             </>
           )}
         </DialogContent>
       </Dialog>
 
       {/* FLAGSHIP 6-8 WEEK HEALTH & PERFORMANCE PROGRAM SHOWCASE */}
-      <section id="flagship-program" className="border-y border-border/60 bg-surface/50">
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
+      <section
+        id="flagship-program"
+        className="scroll-mt-24 rounded-3xl border border-border/60 bg-surface/50 px-6 py-14 sm:px-8 sm:py-18"
+      >
+        <div>
           <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr]">
             <div>
               <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
-              <p className="eyebrow mt-5 text-brand-amber">Flagship Cohort Storefront</p>
+              <p className="eyebrow mt-5 text-brand-amber">Flagship Program</p>
               <h2 className="text-display mt-3 text-4xl sm:text-5xl md:text-6xl">
                 6–8 Week Health &amp; Performance Program
               </h2>
               <p className="mt-4 text-base font-light leading-relaxed text-muted-foreground">
-                Our periodized sprint, strength, and sports nutrition cohort built by Head Coach
-                Daniel Reyes and Sports Dietitian Priya Shah. Engineered to build sustainable
-                fueling habits and repeatable speed across 8 weeks.
+                Our periodized sprint, strength, and sports nutrition curriculum engineered to build
+                sustainable fueling habits and repeatable output across 8 focused weeks.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 {[
                   { icon: Flame, label: "Sprint & Power", value: "3x / week + mobility" },
                   { icon: Utensils, label: "Macro Periodization", value: "Rest vs Training days" },
-                  { icon: Droplets, label: "Biometric Reviews", value: "Weekly coach check-in" },
+                  { icon: Droplets, label: "Weekly Check-Ins", value: "Structured load tracking" },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="rounded-xl border border-border bg-background/70 p-4">
                     <Icon className="size-4 text-brand-orange" aria-hidden="true" />
@@ -631,13 +587,13 @@ function NutritionPage() {
                 ))}
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <Button
                   type="button"
                   variant="hero"
                   size="xl"
-                  className="min-h-12"
-                  disabled={busyPlan !== null || (!configured && Boolean(session))}
+                  className="min-h-12 w-full sm:w-auto"
+                  disabled={busyPlan !== null}
                   onClick={() => handleEnroll("program_8week")}
                 >
                   {busyPlan === "program_8week" ? (
@@ -648,13 +604,17 @@ function NutritionPage() {
                     <>
                       <ShieldCheck aria-hidden="true" /> Enrolled in 8-Week Program
                     </>
+                  ) : !configured ? (
+                    <>
+                      Preview Program — $399 <ArrowRight aria-hidden="true" />
+                    </>
                   ) : (
                     <>
                       Enroll Now — $399 <ArrowRight aria-hidden="true" />
                     </>
                   )}
                 </Button>
-                <Button asChild variant="glass" size="xl" className="min-h-12">
+                <Button asChild variant="glass" size="xl" className="min-h-12 w-full sm:w-auto">
                   <Link to="/contact">
                     <CalendarClock aria-hidden="true" /> Book Consultation
                   </Link>
@@ -664,7 +624,7 @@ function NutritionPage() {
 
             <div className="space-y-4">
               <div className="overflow-hidden rounded-2xl border border-border bg-background">
-                <img
+                <AthleticImage
                   src={SITE_MEDIA.nutritionGreens.src}
                   alt={SITE_MEDIA.nutritionGreens.alt}
                   width={SITE_MEDIA.nutritionGreens.width}
@@ -696,7 +656,7 @@ function NutritionPage() {
       </section>
 
       {/* CUSTOM NUTRITION PACKAGES STOREFRONT */}
-      <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
+      <section id="nutrition-packages" className="scroll-mt-24 pt-16 sm:pt-20">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="eyebrow">Custom Performance Packages</p>
@@ -706,7 +666,7 @@ function NutritionPage() {
           </div>
           <p className="max-w-md text-sm font-light text-muted-foreground">
             Processed securely via Stripe Checkout. Choose a one-time custom fueling blueprint, the
-            flagship 8-week cohort, or ongoing bi-weekly RD adjustments.
+            8-week cohort, or ongoing bi-weekly adjustments.
           </p>
         </div>
 
@@ -780,7 +740,7 @@ function NutritionPage() {
                     variant={pkg.highlighted ? "hero" : "glass"}
                     size="xl"
                     className="w-full"
-                    disabled={owned || busyPlan !== null || (!configured && Boolean(session))}
+                    disabled={owned || busyPlan !== null}
                     onClick={() => handleEnroll(pkg.id)}
                   >
                     {busyPlan === pkg.id ? (
@@ -789,6 +749,10 @@ function NutritionPage() {
                       </>
                     ) : owned ? (
                       "Enrolled / Active"
+                    ) : !configured ? (
+                      <>
+                        Preview Tier ({pkg.priceDisplay}) <ArrowRight />
+                      </>
                     ) : !session ? (
                       <>
                         Sign up &amp; enroll <ArrowRight />
@@ -813,33 +777,52 @@ function NutritionPage() {
           })}
         </div>
       </section>
-    </div>
+    </PageWithOutline>
   );
 }
 
 function NutrientRowCard({
   nutrient,
-  selectedAge,
+  isInspected,
+  onInspect,
   onOpen,
 }: {
   nutrient: NutrientEntry;
-  selectedAge: string;
+  isInspected: boolean;
+  onInspect: (n: NutrientEntry) => void;
   onOpen: (n: NutrientEntry) => void;
 }) {
-  const ageNote =
-    selectedAge !== "All" && nutrient.ageGuidance
-      ? nutrient.ageGuidance[selectedAge as AgeGroup]
-      : undefined;
+  const priority = getNutrientPriority(nutrient);
+  const tierColor =
+    priority.tier === "high"
+      ? "text-brand-amber"
+      : priority.tier === "situational"
+        ? "text-brand-orange"
+        : "text-brand-indigo";
 
   return (
     <button
       type="button"
+      onMouseEnter={() => onInspect(nutrient)}
+      onFocus={() => onInspect(nutrient)}
       onClick={() => onOpen(nutrient)}
-      className="group flex flex-col justify-between rounded-xl border border-border bg-background/60 p-4 text-left transition-colors hover:border-brand-amber/50 hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        "group flex flex-col justify-between rounded-xl border bg-background/60 p-4 text-left transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        isInspected
+          ? "border-brand-amber/60 bg-background"
+          : "border-border hover:border-brand-amber/40",
+      )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h4 className="text-base font-medium text-foreground group-hover:text-brand-amber">
+          <p className={cn("font-mono text-[0.64rem] uppercase tracking-[0.14em]", tierColor)}>
+            {priority.tier === "high"
+              ? "High Priority"
+              : priority.tier === "situational"
+                ? "Situational"
+                : "Baseline"}
+          </p>
+          <h4 className="mt-1 text-base font-medium text-foreground group-hover:text-brand-amber">
             {nutrient.name}
           </h4>
           <p className="mt-1 text-sm font-light leading-relaxed text-muted-foreground">
@@ -850,14 +833,6 @@ function NutrientRowCard({
           Open →
         </span>
       </div>
-      {ageNote && (
-        <p className="mt-2.5 border-t border-border/60 pt-2 text-xs text-foreground/85">
-          <span className="font-mono text-[0.64rem] uppercase tracking-[0.12em] text-brand-orange">
-            {selectedAge}:
-          </span>{" "}
-          {ageNote}
-        </p>
-      )}
     </button>
   );
 }

@@ -1,23 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
+import { AthleticImage } from "@/components/site/athletic-image";
+import { ForceCurveAccent } from "@/components/site/biomechanical-curves";
+import { PageWithOutline, type OutlineSection } from "@/components/site/page-outline";
 import { Button } from "@/components/ui/button";
 import { SITE_MEDIA } from "@/lib/media";
+
+const ABOUT_OUTLINE: OutlineSection[] = [
+  { id: "about-mission", label: "Mission" },
+  { id: "about-methodology", label: "Methodology" },
+  { id: "about-architecture", label: "Platform Hubs" },
+];
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Dusk Kinetic Performance" },
+      { title: "About — Auctus Performance" },
       {
         name: "description",
         content:
-          "Dusk Kinetic Performance bridges the gap between elite sports science, nutrition, and accessible coaching.",
+          "Auctus Performance helps athletes and everyday movers understand the science behind training, recovery, and nutrition—without wasting time.",
       },
-      { property: "og:title", content: "About — Dusk Kinetic Performance" },
+      { property: "og:title", content: "About — Auctus Performance" },
       {
         property: "og:description",
         content:
-          "Research-backed methodology, practitioner coaching bios, and our mission to make pro-caliber training accessible.",
+          "Our mission, evidence-based training methodology, and transparent overview of the five hubs inside Auctus Performance.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -30,84 +39,89 @@ const METHODOLOGY = [
   {
     number: "01",
     title: "Biomechanics before intensity",
-    body: "Adding weight or sprinting fatigue over faulty mechanics only reinforces compensations. Every progression starts with joint stacking, ground contact stiffness, and clean movement patterns.",
+    body: "Adding weight or sprint fatigue over faulty mechanics only reinforces compensations. Every progression starts with joint alignment, ground contact stiffness, and clean movement patterns.",
   },
   {
     number: "02",
-    title: "Evidence translated to Monday morning",
-    body: "Peer-reviewed research only helps when you know sets, reps, rest intervals, and exercise selection. Our practitioners convert lab data into clear, repeatable court and weight-room blocks.",
+    title: "Evidence translated to practice",
+    body: "Sports science only helps when you know sets, reps, rest intervals, and daily intake targets. We organize primary research into clear, practical guidance without academic fluff.",
   },
   {
     number: "03",
-    title: "Tendon resilience & smart load progression",
-    body: "Soft-tissue availability decides seasons. Eccentric hamstring work, hip capsule mobility, and session-RPE workload guardrails are baked into every weekly schedule.",
+    title: "Tendon resilience & recovery balance",
+    body: "Availability decides long-term progress. Eccentric hamstring work, ankle and hip mobility, and sleep-recovery pacing are built alongside high-output work.",
   },
   {
     number: "04",
-    title: "Objective film review every week",
-    body: "Feel rarely matches reality at game speed. Comparing your actual rep footage against structured mechanical cues eliminates guesswork between in-person sessions.",
+    title: "Objective video feedback",
+    body: "What a rep feels like rarely matches what happens at speed. Reviewing uploaded clips or YouTube links against structured mechanical cues removes guesswork.",
   },
 ];
 
-const COACH_TEAM = [
+const PLATFORM_PILLARS = [
   {
-    name: "Coach Daniel Reyes, CSCS",
-    role: "Head Coach & Performance Director",
-    credentials: "Collegiate S&C · Sprint & Force-Plate Coaching",
-    bio: "Led strength, speed, and return-to-court programming for collegiate basketball and track programs before founding Dusk Kinetic to make structured mechanical coaching accessible.",
+    title: "Training Library & Workout Builder",
+    detail:
+      "230+ exercises across 12 movement categories with smart prescriptions, muscle/equipment filters, and session builder.",
+    to: "/training" as const,
   },
   {
-    name: "Dr. Maya Okafor, PhD",
-    role: "Lead Sports Physiologist",
-    credentials: "PhD Exercise Physiology · Workload & Recovery Research",
-    bio: "Directs Dusk Kinetic's research curriculum across sleep architecture, eccentric injury prevention, and neuromuscular fatigue monitoring so athletes peak when competition matters.",
+    title: "Recovery Science",
+    detail: "Evidence-backed sleep, workload, and soft-tissue protocols inside Latest Science.",
+    to: "/articles" as const,
   },
   {
-    name: "Priya Shah, RD, CSSD",
-    role: "Performance Dietitian",
-    credentials: "Board-Certified Specialist in Sports Dietetics",
-    bio: "Builds practical carbohydrate periodization, hydration, and match-day fueling protocols designed around school, full-time work, and multi-game tournament schedules.",
+    title: "Verified Nutrition Reference",
+    detail:
+      "All 26 essential macronutrients, vitamins, and minerals with priority cues and biochemical depth.",
+    to: "/nutrition" as const,
   },
   {
-    name: "Dr. Lena Brooks, PsyD",
-    role: "Applied Sport Psychologist",
-    credentials: "CMPC · Motor Imagery & Clutch Execution",
-    bio: "Designs PETTLEP visualization sequences, pre-shot reset routines, and pressure-regulation frameworks used by sprinters, shooters, and club competitors.",
+    title: "Latest Science Hub",
+    detail:
+      "Structured across Training, Recovery, and Nutrition with 5-star reader ratings and discussion.",
+    to: "/articles" as const,
+  },
+  {
+    title: "Gemini AI Video Analysis",
+    detail:
+      "Upload a training clip (.mp4, .mov, .webm) or YouTube link for cue-based form feedback.",
+    to: "/submit" as const,
   },
 ];
 
 function AboutPage() {
   return (
-    <div>
+    <PageWithOutline sections={ABOUT_OUTLINE} title="About">
       {/* Mission Hero */}
-      <section className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
+      <section id="about-mission" className="scroll-mt-24 py-6 sm:py-10">
         <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
-        <p className="eyebrow mt-6 text-brand-amber">About Dusk Kinetic Performance</p>
+        <p className="eyebrow mt-6 text-brand-amber">About Auctus Performance</p>
         <div className="mt-4 grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
           <div>
-            <h1 className="text-display text-5xl md:text-7xl">
-              Bridging elite sports science and accessible coaching.
+            <h1 className="text-display text-4xl sm:text-5xl md:text-6xl">
+              Understand the science behind athletics and health—without wasting time.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-muted-foreground">
-              Pro clubs and funded collegiate programs employ biomechanists, strength coaches,
-              dietitians, and film analysts under one roof. Everyday athletes get scattered clips.
-              Dusk Kinetic closes that gap with structured training, nutrition protocols, and fast,
-              objective video feedback anyone can afford.
+            <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
+              Reliable sports science, practical nutrition data, and objective movement feedback are
+              often buried behind jargon or fragmented across dozens of feeds. Auctus Performance
+              brings verified nutrition reference data, structured drill libraries, focused
+              research, and AI video analysis into one clear workspace.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild variant="hero" size="xl" className="min-h-12">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button asChild variant="hero" size="xl" className="min-h-12 w-full sm:w-auto">
                 <Link to="/pricing">
-                  Explore memberships <ArrowRight aria-hidden="true" />
+                  Explore Memberships <ArrowRight aria-hidden="true" />
                 </Link>
               </Button>
-              <Button asChild variant="glass" size="xl" className="min-h-12">
-                <Link to="/contact">Book a call</Link>
+              <Button asChild variant="glass" size="xl" className="min-h-12 w-full sm:w-auto">
+                <Link to="/contact">Contact &amp; Support</Link>
               </Button>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-border bg-surface">
-            <img
+            <AthleticImage
               src={SITE_MEDIA.trainingGym.src}
               alt={SITE_MEDIA.trainingGym.alt}
               width={SITE_MEDIA.trainingGym.width}
@@ -120,16 +134,19 @@ function AboutPage() {
       </section>
 
       {/* Research-Backed Methodology */}
-      <section className="border-y border-border/60 bg-surface/40">
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
+      <section
+        id="about-methodology"
+        className="mt-10 scroll-mt-24 rounded-3xl border border-border/60 bg-surface/40 px-6 py-12 sm:px-8 sm:py-16"
+      >
+        <div>
           <div className="max-w-2xl">
             <p className="eyebrow">Methodology</p>
-            <h2 className="text-display mt-4 text-4xl md:text-5xl">
-              Research-backed training with zero guesswork.
+            <h2 className="text-display mt-4 text-3xl sm:text-4xl md:text-5xl">
+              Built on mechanics, verified data, and consistency.
             </h2>
-            <p className="mt-4 text-base font-light text-muted-foreground">
-              Four core principles govern every drill in the Training Library and every breakdown
-              returned by our AI technique review engine.
+            <p className="mt-4 text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
+              Four practical standards shape every drill in the Training Library, our verified
+              nutrient reference, and our AI technique breakdown framework.
             </p>
           </div>
 
@@ -137,7 +154,7 @@ function AboutPage() {
             {METHODOLOGY.map((item) => (
               <article
                 key={item.number}
-                className="rounded-2xl border border-border bg-surface p-8"
+                className="rounded-2xl border border-border bg-surface p-7 sm:p-8"
               >
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-brand-amber tabular-nums">
                   {item.number}.
@@ -152,47 +169,45 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Coach Bio & Lab Team */}
-      <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.3fr]">
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface">
-            <img
-              src={SITE_MEDIA.coachLab.src}
-              alt={SITE_MEDIA.coachLab.alt}
-              width={SITE_MEDIA.coachLab.width}
-              height={SITE_MEDIA.coachLab.height}
-              loading="lazy"
-              decoding="async"
-              className="aspect-[4/3] w-full object-cover"
-            />
-            <div className="border-t border-border p-6">
-              <p className="eyebrow text-brand-red">Kinetic Coaching Staff</p>
-              <p className="mt-2 text-base font-normal text-foreground">
-                Practitioners across strength, sprint mechanics, physiology, nutrition, and sport
-                psychology.
-              </p>
-            </div>
+      {/* Platform Architecture Overview (Zero Fabricated Bios) */}
+      <section id="about-architecture" className="scroll-mt-24 pt-14 sm:pt-20">
+        <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.3fr]">
+          <div className="rounded-2xl border border-border bg-surface p-7">
+            <p className="eyebrow text-brand-orange">Platform Architecture</p>
+            <h2 className="text-display mt-3 text-3xl text-foreground">
+              What is inside Auctus Performance
+            </h2>
+            <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
+              Every hub is structured so you can inspect the reasoning behind a movement or nutrient
+              and apply it in the gym the same day.
+            </p>
+            <ForceCurveAccent className="mt-6 w-full text-foreground" />
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            {COACH_TEAM.map((coach) => (
-              <article
-                key={coach.name}
-                className="flex flex-col justify-between rounded-2xl border border-border bg-surface p-6"
+          <div className="divide-y divide-border/70 rounded-2xl border border-border bg-surface px-6 sm:px-8">
+            {PLATFORM_PILLARS.map((pillar, idx) => (
+              <Link
+                key={pillar.title}
+                to={pillar.to}
+                className="group flex flex-col justify-between gap-2 py-6 transition-colors sm:flex-row sm:items-center sm:gap-6"
               >
                 <div>
-                  <p className="eyebrow text-brand-orange">{coach.role}</p>
-                  <h3 className="text-display mt-2 text-2xl text-foreground">{coach.name}</h3>
-                  <p className="mt-1 text-xs font-medium text-foreground/80">{coach.credentials}</p>
-                  <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
-                    {coach.bio}
-                  </p>
+                  <span className="font-mono text-xs text-brand-amber tabular-nums">
+                    0{idx + 1}.
+                  </span>
+                  <h3 className="text-display mt-1 text-xl text-foreground group-hover:text-brand-amber">
+                    {pillar.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm font-light text-muted-foreground">{pillar.detail}</p>
                 </div>
-              </article>
+                <span className="shrink-0 font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground group-hover:text-brand-amber">
+                  Open →
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
-    </div>
+    </PageWithOutline>
   );
 }

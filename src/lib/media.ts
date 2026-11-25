@@ -1,31 +1,33 @@
+export const DEFAULT_GYM_FALLBACK = "/images/gym-arena-cta.jpg";
+
 export const SITE_MEDIA = {
   heroCourt: {
-    src: "/images/dusk-silhouette-runner.jpg",
-    alt: "Runner silhouetted against an amber and twilight dusk horizon during evening conditioning",
-    width: 1280,
-    height: 772,
+    src: "/images/gym-hero-athletics.jpg",
+    alt: "Strength athlete mid-barbell pull inside a vibrant dusk-lit performance gym with bumper plates and squat racks",
+    width: 1408,
+    height: 768,
   },
   trainingGym: {
-    src: "/images/dusk-track-sunset.jpg",
-    alt: "Outdoor athletics track illuminated by warm sunset light at golden hour",
+    src: "/images/gym-power-sleds.jpg",
+    alt: "Athlete driving a loaded sprint sled past plyometric boxes and battle ropes under vibrant sunset orange gym lighting",
     width: 1280,
-    height: 852,
+    height: 960,
   },
   arenaCta: {
-    src: "/images/dusk-track-golden.jpg",
-    alt: "Running lanes glowing under burnt orange and twilight sunset skies",
-    width: 1280,
-    height: 852,
+    src: "/images/gym-arena-cta.jpg",
+    alt: "Indoor strength racks, kettlebells, plyometric jump boxes, and sprint turf lanes lit in warm amber and twilight indigo",
+    width: 1408,
+    height: 768,
   },
   authCourt: {
-    src: "/images/dusk-lone-runner.jpg",
-    alt: "Distance athlete training solo along a dusk skyline at sunset",
+    src: "/images/gym-kettlebell-strength.jpg",
+    alt: "Focused athlete chalking hands beside barbell racks, kettlebells, and wooden plyo boxes in twilight amber gym lighting",
     width: 1280,
-    height: 857,
+    height: 960,
   },
   coachLab: {
-    src: "/images/dusk-sprinter-stride.jpg",
-    alt: "Sprinter driving forward mid-stride during outdoor speed coaching at dusk",
+    src: "/images/gym-coaching-lab.jpg",
+    alt: "Performance coach filming an athlete performing explosive kettlebell box jumps on an indoor gym turf floor",
     width: 1280,
     height: 960,
   },
@@ -45,7 +47,7 @@ export const SITE_MEDIA = {
 
 const VIDEO_IMAGE_BY_YOUTUBE_ID: Record<string, { src: string; alt: string }> = {
   ZaTM37cfiDs: {
-    src: "/images/deadlift.jpg",
+    src: "/images/gym-hero-athletics.jpg",
     alt: "Athlete setting grip and neutral back position over a loaded barbell deadlift",
   },
   my0tLDaWyDU: {
@@ -53,28 +55,28 @@ const VIDEO_IMAGE_BY_YOUTUBE_ID: Record<string, { src: string; alt: string }> = 
     alt: "Lifter executing a controlled barbell back squat in an indoor strength rack",
   },
   oMXHBcI1wJU: {
-    src: "/images/plyometrics.jpg",
-    alt: "Explosive strength athlete driving vertically during a gym power session",
+    src: "/images/gym-coaching-lab.jpg",
+    alt: "Explosive athlete executing weighted box jumps in a performance gym",
   },
   "3-4pKUhkzoQ": {
     src: "/images/hamstrings.jpg",
     alt: "Close-up of posterior chain grip preparation for lower-body strength work",
   },
   H3iPiweaQqQ: {
-    src: "/images/sprint-blocks.jpg",
-    alt: "Track athlete accelerating cleanly out of instrumented starting blocks",
+    src: "/images/gym-power-sleds.jpg",
+    alt: "Athlete driving low on loaded turf sprint sleds inside an indoor training facility",
   },
   "WNaWD-bxFT0": {
-    src: "/images/dusk-sprinter-stride.jpg",
-    alt: "Sprinter driving at top velocity outdoors during golden hour",
+    src: "/images/plyometrics.jpg",
+    alt: "Explosive acceleration and vertical power session in the weight room",
   },
   "9ZTRUVLjGzI": {
-    src: "/images/dusk-track-sunset.jpg",
-    alt: "Speed blocks aligned on an outdoor sprint track at sunset",
+    src: "/images/agility-footwork.jpg",
+    alt: "Quick lateral deceleration and footwork progression on indoor turf",
   },
   ZJBprx7oWAM: {
     src: "/images/warmup-mobility.jpg",
-    alt: "Athlete performing a dynamic lower-body stretch prior to speed work",
+    alt: "Athlete performing a dynamic lower-body stretch prior to strength work",
   },
   jj2AAH6jbHk: {
     src: "/images/hip-mobility.jpg",
@@ -82,7 +84,7 @@ const VIDEO_IMAGE_BY_YOUTUBE_ID: Record<string, { src: string; alt: string }> = 
   },
   BoGzAZ_vOyA: {
     src: "/images/foam-roll.jpg",
-    alt: "Athlete performing lower-body soft-tissue foam rolling between sessions",
+    alt: "Athlete performing lower-body soft-tissue foam rolling between sets",
   },
   E4O2JeAYg5Q: {
     src: "/images/basketball-skills.jpg",
@@ -101,8 +103,8 @@ const VIDEO_IMAGE_BY_YOUTUBE_ID: Record<string, { src: string; alt: string }> = 
     alt: "Soccer midfielder planting and striking a clean inside-foot pass on turf",
   },
   "5Ja5gwko9ro": {
-    src: "/images/dusk-lone-runner.jpg",
-    alt: "Focused runner holding race pace under a quiet dusk horizon",
+    src: "/images/gym-kettlebell-strength.jpg",
+    alt: "Focused athlete preparing chalked grip near racks and kettlebells before heavy sets",
   },
   HQwMrK54494: {
     src: "/images/hero-court.jpg",
@@ -112,21 +114,21 @@ const VIDEO_IMAGE_BY_YOUTUBE_ID: Record<string, { src: string; alt: string }> = 
 
 const IMAGE_BY_SPORT: Record<string, string> = {
   Basketball: "/images/basketball-skills.jpg",
-  "Track & Field": "/images/dusk-track-sunset.jpg",
+  "Track & Field": "/images/gym-power-sleds.jpg",
   Soccer: "/images/soccer-passing.jpg",
   Tennis: "/images/tennis-serve.jpg",
   Swimming: "/images/swimming-freestyle.jpg",
   Football: "/images/agility-footwork.jpg",
-  Strength: "/images/squat.jpg",
-  Running: "/images/dusk-silhouette-runner.jpg",
+  Strength: "/images/gym-kettlebell-strength.jpg",
+  Running: "/images/gym-power-sleds.jpg",
 };
 
 const IMAGE_BY_SECTION: Record<string, string> = {
-  "Strength & Power": "/images/deadlift.jpg",
-  "Speed & Agility": "/images/sprint-blocks.jpg",
+  "Strength & Power": "/images/gym-hero-athletics.jpg",
+  "Speed & Agility": "/images/gym-power-sleds.jpg",
   "Mobility & Recovery": "/images/warmup-mobility.jpg",
   "Sport Skills": "/images/basketball-skills.jpg",
-  Mindset: "/images/dusk-lone-runner.jpg",
+  Mindset: "/images/gym-kettlebell-strength.jpg",
 };
 
 export function getVideoThumbnail(input: {

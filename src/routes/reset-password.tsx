@@ -12,15 +12,15 @@ import { getMockPendingRecoveryEmail } from "@/lib/mock-supabase";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Set a New Password — Dusk Kinetic Performance" },
+      { title: "Set a New Password — Auctus Performance" },
       {
         name: "description",
-        content: "Choose a new password for your Dusk Kinetic Performance account.",
+        content: "Choose a new password for your Auctus Performance account.",
       },
-      { property: "og:title", content: "Set a New Password — Dusk Kinetic Performance" },
+      { property: "og:title", content: "Set a New Password — Auctus Performance" },
       {
         property: "og:description",
-        content: "Update your Dusk Kinetic Performance password securely.",
+        content: "Update your Auctus Performance password securely.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

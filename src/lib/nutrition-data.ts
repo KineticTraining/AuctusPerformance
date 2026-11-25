@@ -30,6 +30,270 @@ const ALL_AGES: AgeGroup[] = [
   "Older Adult / Masters (45+)",
 ];
 
+export type NutrientPriorityTier = "high" | "situational" | "baseline";
+
+export type NutrientPriorityInfo = {
+  tier: NutrientPriorityTier;
+  tierLabel: string;
+  athleticFocus: string;
+  gapSignal: string;
+  coverageScore: number; // 0-100 visual index comparing typical diet coverage vs target
+  priorityWhy: string;
+};
+
+export const NUTRIENT_PRIORITIES: Record<string, NutrientPriorityInfo> = {
+  carbohydrates: {
+    tier: "high",
+    tierLabel: "High Priority · Primary Output Fuel",
+    athleticFocus: "Glycogen & sprint power",
+    gapSignal: "Fiber intake (~16.6 g) lags 25–38 g target",
+    coverageScore: 76,
+    priorityWhy:
+      "Primary fuel for high-intensity bouts and brain focus; intake should scale directly with daily training volume.",
+  },
+  proteins: {
+    tier: "high",
+    tierLabel: "High Priority · Tissue Repair",
+    athleticFocus: "Muscle remodeling & enzyme synthesis",
+    gapSignal: "Distribution across meals matters for repair",
+    coverageScore: 86,
+    priorityWhy:
+      "Supplies essential amino acids to rebuild muscle fibers and connective tissue after mechanical training stress.",
+  },
+  "lipids-fats": {
+    tier: "high",
+    tierLabel: "High Priority · Foundational Reserve",
+    athleticFocus: "Hormone synthesis & joint membranes",
+    gapSignal: "Prioritize unsaturated & omega-3 fat quality",
+    coverageScore: 88,
+    priorityWhy:
+      "Supports endocrine health, cellular membrane integrity, and absorption of fat-soluble vitamins A, D, E, and K.",
+  },
+  "vitamin-d": {
+    tier: "high",
+    tierLabel: "High Priority · Widespread Gap",
+    athleticFocus: "Bone density & neuromuscular drive",
+    gapSignal: "Over 90% under-consume from food alone (~5 mcg vs 15 mcg)",
+    coverageScore: 34,
+    priorityWhy:
+      "Dietary intake averages a third of the RDA; critical for calcium absorption, bone resilience under load, and immune readiness.",
+  },
+  magnesium: {
+    tier: "high",
+    tierLabel: "High Priority · Widespread Gap",
+    athleticFocus: "Muscle relaxation & ATP reactions",
+    gapSignal: "Over half of adults fall short (~300 mg vs 310–420 mg)",
+    coverageScore: 72,
+    priorityWhy:
+      "Required to bind ATP for energy transfer and counterbalance calcium during muscle relaxation and sleep recovery.",
+  },
+  potassium: {
+    tier: "high",
+    tierLabel: "High Priority · Widespread Gap",
+    athleticFocus: "Electrolyte balance & nerve conduction",
+    gapSignal: "Average intake ~2,550 mg vs 2,600–3,400 mg target",
+    coverageScore: 74,
+    priorityWhy:
+      "Primary intracellular electrolyte working against high dietary sodium to support nerve firing, blood pressure, and hydration.",
+  },
+  "vitamin-e": {
+    tier: "high",
+    tierLabel: "High Priority · Antioxidant Gap",
+    athleticFocus: "Membrane oxidative protection",
+    gapSignal: "~80% fall below the 15 mg/day RDA from food",
+    coverageScore: 60,
+    priorityWhy:
+      "Protects lipid cell membranes from oxidative stress generated during high-volume aerobic and resistance sessions.",
+  },
+  "vitamin-c-ascorbic-acid": {
+    tier: "situational",
+    tierLabel: "Situational · Collagen & Immune Support",
+    athleticFocus: "Tendon/ligament collagen & iron uptake",
+    gapSignal: "40–45% of Americans fall short of 75–90 mg RDA",
+    coverageScore: 84,
+    priorityWhy:
+      "Essential cofactor for collagen cross-linking in tendons and ligaments, while doubling non-heme plant iron absorption.",
+  },
+  "vitamin-a": {
+    tier: "situational",
+    tierLabel: "Situational · Food-Choice Dependent",
+    athleticFocus: "Visual tracking & mucosal immunity",
+    gapSignal: "Nearly half fall slightly below 700–900 mcg RAE",
+    coverageScore: 78,
+    priorityWhy:
+      "Easily covered via orange vegetables and leafy greens, yet often missed when colorful produce drops out of weekly meals.",
+  },
+  calcium: {
+    tier: "situational",
+    tierLabel: "Situational · Bone Load Dependent",
+    athleticFocus: "Skeletal strength & muscle contraction",
+    gapSignal: "Women and older adults frequently fall below 1,000–1,200 mg",
+    coverageScore: 82,
+    priorityWhy:
+      "Anchors bone mineral density against jumping and running impact forces while triggering every cross-bridge muscle contraction.",
+  },
+  iron: {
+    tier: "situational",
+    tierLabel: "Situational · Endurance & Diet Dependent",
+    athleticFocus: "Oxygen transport in blood & muscle",
+    gapSignal: "Men usually meet 8 mg; premenopausal women often miss 18 mg",
+    coverageScore: 76,
+    priorityWhy:
+      "Governs hemoglobin and myoglobin oxygen delivery; high-impact foot-strike endurance athletes and menstruating women need closer tracking.",
+  },
+  "vitamin-b12-cobalamin": {
+    tier: "situational",
+    tierLabel: "Situational · Diet & Age Dependent",
+    athleticFocus: "Red blood cells & nerve myelin",
+    gapSignal: "Plant-based diets & adults 50+ face absorption gaps",
+    coverageScore: 92,
+    priorityWhy:
+      "Well covered by animal foods, but critical to monitor if avoiding meat/dairy or as gastric acid declines with age.",
+  },
+  sodium: {
+    tier: "situational",
+    tierLabel: "Situational · Sweat-Rate Dependent",
+    athleticFocus: "Extracellular fluid & heavy sweat",
+    gapSignal: "Typical diet (~3,400 mg) exceeds 2,300 mg chronic limit",
+    coverageScore: 98,
+    priorityWhy:
+      "Average diets already contain excess sodium, though athletes losing heavy sweat in heat benefit from targeted rehydration.",
+  },
+  zinc: {
+    tier: "situational",
+    tierLabel: "Situational · Tissue & Immune Demand",
+    athleticFocus: "Tissue repair & immune defense",
+    gapSignal: "Average ~11 mg meets baseline; plant-heavy diets absorb less",
+    coverageScore: 94,
+    priorityWhy:
+      "Supports over 300 repair and immune enzymes; phytates in unsoaked grains/legumes reduce absorption for plant-only athletes.",
+  },
+  "vitamin-k": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Clotting & osteocalcin bone binding",
+    gapSignal: "Average ~120 mcg aligns with 90–120 mcg target",
+    coverageScore: 95,
+    priorityWhy:
+      "Usually met with routine green vegetables; works alongside Vitamin D to bind calcium onto bone matrix.",
+  },
+  "vitamin-b1-thiamin": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Carbohydrate energy conversion",
+    gapSignal: "Average ~1.6 mg exceeds 1.1–1.2 mg RDA",
+    coverageScore: 96,
+    priorityWhy:
+      "Crucial coenzyme for converting carbs into ATP; routinely met through whole or enriched grains and legumes.",
+  },
+  "vitamin-b2-riboflavin": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Mitochondrial electron carriers",
+    gapSignal: "Average ~2.1 mg exceeds 1.1–1.3 mg RDA",
+    coverageScore: 97,
+    priorityWhy:
+      "Drives FAD/FMN redox reactions across carbs and fats; reliably supplied by dairy, eggs, almonds, and grains.",
+  },
+  "vitamin-b3-niacin": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "NAD+/NADP+ energy & DNA repair",
+    gapSignal: "Average ~26 mg exceeds 14–16 mg NE RDA",
+    coverageScore: 97,
+    priorityWhy:
+      "Fuels hundreds of dehydrogenase reactions and cellular repair; readily met when eating poultry, fish, peanuts, or enriched grains.",
+  },
+  "vitamin-b5-pantothenic-acid": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Coenzyme A fuel entry",
+    gapSignal: "Average 5–6 mg meets 5 mg daily target",
+    coverageScore: 94,
+    priorityWhy:
+      "Forms Coenzyme A at the center of energy metabolism and hormone synthesis; present across nearly all whole foods.",
+  },
+  "vitamin-b6-pyridoxine": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Amino acid & glycogen metabolism",
+    gapSignal: "Average ~2.1 mg exceeds 1.3–1.7 mg RDA",
+    coverageScore: 96,
+    priorityWhy:
+      "Key cofactor for protein transamination, glycogen breakdown, and neurotransmitter balance; abundant in fish, chickpeas, and bananas.",
+  },
+  "vitamin-b7-biotin": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Carboxylase energy enzymes",
+    gapSignal: "Estimated 35–50 mcg covers 30 mcg target",
+    coverageScore: 95,
+    priorityWhy:
+      "Supports gluconeogenesis and fatty acid synthesis; deficiency is rare when eating cooked eggs, seeds, and fish.",
+  },
+  "vitamin-b9-folate": {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "DNA synthesis & cell division",
+    gapSignal: "Average ~525 mcg DFE covers 400 mcg adult RDA",
+    coverageScore: 95,
+    priorityWhy:
+      "Essential for red blood cell turnover and tissue repair; important to prioritize leafy greens and legumes (higher need in pregnancy).",
+  },
+  phosphorus: {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "ATP & creatine phosphate backbone",
+    gapSignal: "Average ~1,375 mg is nearly double the 700 mg RDA",
+    coverageScore: 99,
+    priorityWhy:
+      "Forms ATP and creatine phosphate alongside bone mineral; virtually always sufficient in balanced diets.",
+  },
+  chloride: {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Fluid balance & gastric digestion",
+    gapSignal: "Average ~5,200 mg exceeds 2,300 mg AI via dietary salt",
+    coverageScore: 99,
+    priorityWhy:
+      "Partners with sodium for osmotic balance and stomach acid production; rarely deficient outside extreme fluid losses.",
+  },
+  sulfur: {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Protein disulfide bonds & cartilage",
+    gapSignal: "Average ~950 mg met automatically via adequate protein",
+    coverageScore: 96,
+    priorityWhy:
+      "Delivered naturally whenever daily protein targets are met via sulfur-containing amino acids methionine and cysteine.",
+  },
+  copper: {
+    tier: "baseline",
+    tierLabel: "Baseline · Usually Covered",
+    athleticFocus: "Iron loading & collagen cross-linking",
+    gapSignal: "Average ~1.2 mg covers 0.9 mg RDA",
+    coverageScore: 95,
+    priorityWhy:
+      "Works alongside iron and connective tissue enzymes; reliably covered by nuts, seeds, legumes, and dark chocolate.",
+  },
+};
+
+export function getNutrientPriority(entry: NutrientEntry): NutrientPriorityInfo {
+  const matched = NUTRIENT_PRIORITIES[entry.slug];
+  if (matched) return matched;
+  return {
+    tier: entry.group === "Macronutrients" ? "high" : "situational",
+    tierLabel:
+      entry.group === "Macronutrients"
+        ? "High Priority · Core Fuel"
+        : "Situational · Targeted Intake",
+    athleticFocus: "Metabolic & structural support",
+    gapSignal: `Target: ${entry.summarized.bodyNeeds}`,
+    coverageScore: 78,
+    priorityWhy: entry.performanceOneLiner,
+  };
+}
+
 export const SEED_NUTRIENTS: NutrientEntry[] = [
   // [MACRONUTRIENTS]
   {

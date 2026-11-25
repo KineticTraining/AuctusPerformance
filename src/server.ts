@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { handleAuthApiRequest } from "./lib/auth-routes.server";
+import { handleVideoApiRequest } from "./lib/video-submissions.server";
 import { executeServerMockDb, type MockRpcAction } from "./lib/mock-supabase";
 import {
   findMemberByCustomerId,
@@ -176,6 +177,10 @@ export default {
       if (url.pathname.startsWith("/api/auth/")) {
         const authResponse = await handleAuthApiRequest(request);
         if (authResponse) return authResponse;
+      }
+      if (url.pathname.startsWith("/api/video/")) {
+        const videoResponse = await handleVideoApiRequest(request);
+        if (videoResponse) return videoResponse;
       }
       if (url.pathname === "/api/stripe/webhook" && request.method === "POST") {
         return await handleStripeWebhook(request);

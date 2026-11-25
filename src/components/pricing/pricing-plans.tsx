@@ -1,14 +1,29 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, CreditCard, ExternalLink, Loader2, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  CreditCard,
+  ExternalLink,
+  Loader2,
+  Play,
+  ShieldCheck,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { PageWithOutline, type OutlineSection } from "@/components/site/page-outline";
 import { FaqSection } from "@/components/site/social-proof-faq";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  AUCTUS_STATE_EVENT,
+  loadPreviewTier,
+  savePreviewTier,
+  type PreviewTier,
+} from "@/lib/athlete-notes";
 import {
   createBillingPortalSession,
   createCheckoutSession,
@@ -28,6 +43,28 @@ export type PricingPlansProps = {
   returnPath?: "/pricing" | "/membership";
 };
 
+const FREE_TIER_HIGHLIGHTS = [
+  "Browse all 406 exercises across 12 movement categories & filters",
+  "Read Latest Science (Training, Recovery, Nutrition) with info popovers & sport filters",
+  "Explore the 26-nutrient Reference & interactive vitamin/mineral priority graphic",
+  "Rate articles (5-star) & join community comment discussions",
+  "Try Demo previews for AI Video Analysis, Flag for Deeper Review & Smart Prescriptions",
+];
+
+const PRO_TIER_EXTRA_HIGHLIGHTS = [
+  "Higher / unlimited monthly AI Video Analysis uploads & YouTube breakdowns",
+  "Extended clip & movement analysis history access",
+  "Flag for Deeper Review submission & tracking workflow",
+  "Save & organize custom workout plans & private per-exercise training notes",
+];
+
+const PLANS_OUTLINE: OutlineSection[] = [
+  { id: "plans-overview", label: "Overview" },
+  { id: "plans-comparison", label: "Free vs. Pro" },
+  { id: "plans-tiers", label: "Membership Tiers" },
+  { id: "plans-faq", label: "FAQ" },
+];
+
 export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: PricingPlansProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -42,6 +79,7 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
   const [busyPlan, setBusyPlan] = useState<PlanId | "portal" | null>(null);
   const [externalUrl, setExternalUrl] = useState<{ label: string; url: string } | null>(null);
   const [verifiedSessionId, setVerifiedSessionId] = useState<string | null>(null);
+  const [previewTier, setPreviewTier] = useState<PreviewTier>("free");
 
   const catalogQuery = useSuspenseQuery(pricingCatalogQuery());
 
@@ -50,6 +88,13 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
     queryFn: () => fetchBillingStatus(),
     enabled: ready && Boolean(session),
   });
+
+  useEffect(() => {
+    setPreviewTier(loadPreviewTier());
+    const syncTier = () => setPreviewTier(loadPreviewTier());
+    window.addEventListener(AUCTUS_STATE_EVENT, syncTier);
+    return () => window.removeEventListener(AUCTUS_STATE_EVENT, syncTier);
+  }, []);
 
   useEffect(() => {
     if (canceled) {
@@ -63,7 +108,7 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
     confirmCheckout({ data: { sessionId } })
       .then((res) => {
         queryClient.setQueryData(["billing-status", session.user.id], res);
-        toast.success("Membership activated — welcome to Dusk Kinetic.");
+        toast.success("Membership activated — welcome to Auctus Performance.");
         navigate({
           to: returnPath,
           search: { session_id: undefined, canceled: undefined },
@@ -98,7 +143,19 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
     }
   }
 
-  async function handleSubscribe(plan: PlanId) {
+  function handleActivatePreview(tierLabel: string) {
+    savePreviewTier("pro_preview");
+    setPreviewTier("pro_preview");
+    toast.success(
+      `${tierLabel} demo preview enabled — no card or payment processed. Test Workout Saving, Private Notes & Flagging now.`,
+    );
+  }
+
+  async function handleSubscribe(plan: PlanId, planName: string) {
+    if (!configured) {
+      handleActivatePreview(planName);
+      return;
+    }
     if (!session) {
       navigate({ to: "/auth", search: { mode: "signup" } });
       return;
@@ -146,67 +203,160 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
       : allPlans.filter((plan) => plan.interval === intervalFilter);
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
-      <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
-      <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="eyebrow">Plans &amp; Pricing</p>
-            {configured && (
-              <>
-                <span className="text-xs text-muted-foreground" aria-hidden="true">
-                  ·
-                </span>
-                <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-amber">
-                  Stripe {keyMode === "live" ? "Live" : "Test"} Mode
-                </span>
-              </>
-            )}
+    <PageWithOutline sections={PLANS_OUTLINE} title="Plans">
+      <div id="plans-overview" className="scroll-mt-24">
+        <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
+        <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="eyebrow">Plans</p>
+              <span className="text-xs text-muted-foreground" aria-hidden="true">
+                ·
+              </span>
+              <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-brand-amber">
+                {configured
+                  ? `Stripe ${keyMode === "live" ? "Live" : "Test"} Mode`
+                  : "Preview / Demo Tiers"}
+              </span>
+            </div>
+            <h1 className="text-display mt-3 max-w-2xl text-4xl sm:text-5xl md:text-6xl">
+              Free core access. Pro coaching depth.
+            </h1>
           </div>
-          <h1 className="text-display mt-4 max-w-3xl text-4xl sm:text-5xl md:text-7xl">
-            Pick the training tier that fits your season.
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg font-light text-muted-foreground">
-            From focused two-sport mechanics to unlimited coaching and AI video reviews — billed
-            securely through Stripe.
-          </p>
-        </div>
 
-        <div className="inline-flex self-start rounded-full border border-border bg-surface p-1">
-          {(
-            [
-              ["all", "All plans"],
-              ["month", "Monthly"],
-              ["year", "Annual"],
-            ] as const
-          ).map(([val, label]) => (
-            <button
-              key={val}
-              type="button"
-              onClick={() => setIntervalFilter(val)}
-              className={cn(
-                "min-h-10 rounded-full px-4 py-1.5 text-sm font-normal whitespace-nowrap transition-colors sm:min-h-9",
-                intervalFilter === val
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {label}
-            </button>
-          ))}
+          <div className="inline-flex w-full self-start rounded-full border border-border bg-surface p-1 sm:w-auto">
+            {(
+              [
+                ["all", "All"],
+                ["month", "Monthly"],
+                ["year", "Annual"],
+              ] as const
+            ).map(([val, label]) => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => setIntervalFilter(val)}
+                className={cn(
+                  "min-h-11 flex-1 rounded-full px-4 py-1.5 text-sm font-normal whitespace-nowrap transition-colors sm:flex-initial",
+                  intervalFilter === val
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
+      {/* CLEAR PREVIEW / DEMO STATUS + INTERACTIVE DEMOS LAUNCHER */}
       {!configured && (
-        <div className="mt-8 rounded-2xl border border-brand-red/40 bg-surface p-6">
-          <p className="eyebrow text-brand-red">Stripe environment setup</p>
-          <p className="mt-2 text-sm text-foreground">
-            Add your <code className="font-mono text-xs text-brand-amber">STRIPE_SECRET_KEY</code>{" "}
-            to your server environment and restart the server to enable live Stripe Checkout
-            sessions.
-          </p>
+        <div className="mt-8 flex flex-col justify-between gap-4 rounded-2xl border border-brand-amber/40 bg-surface p-5 sm:p-6 lg:flex-row lg:items-center">
+          <div>
+            <p className="eyebrow text-brand-amber">Preview Mode · No Real Charges</p>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Toggle Pro Preview below to test workout saving, personal notes, and flagging.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            <Button
+              type="button"
+              variant={previewTier === "pro_preview" ? "outline" : "hero"}
+              size="default"
+              onClick={() => {
+                const next = previewTier === "pro_preview" ? "free" : "pro_preview";
+                savePreviewTier(next);
+                setPreviewTier(next);
+                toast.success(
+                  next === "pro_preview"
+                    ? "Pro Preview Mode enabled."
+                    : "Returned to Free access mode.",
+                );
+              }}
+              className="min-h-11 whitespace-nowrap"
+            >
+              {previewTier === "pro_preview"
+                ? "Pro Preview Active (Switch to Free)"
+                : "Activate Pro Preview (Demo)"}
+            </Button>
+            <Button
+              asChild
+              variant="glass"
+              size="default"
+              className="min-h-11 gap-1.5 whitespace-nowrap"
+            >
+              <Link to="/submit">
+                <Play className="size-3.5 text-brand-amber" aria-hidden="true" />
+                Try AI Video Demo
+              </Link>
+            </Button>
+          </div>
         </div>
       )}
+
+      {/* FREE VS PRO SIDE-BY-SIDE CLARITY */}
+      <section id="plans-comparison" className="mt-10 scroll-mt-24 grid gap-6 lg:grid-cols-2">
+        <article className="flex flex-col justify-between rounded-2xl border border-border bg-surface p-7">
+          <div>
+            <p className="eyebrow text-muted-foreground">Free Access · Always Open</p>
+            <div className="mt-3 flex items-baseline gap-2.5">
+              <span className="text-display text-4xl font-light tabular-nums sm:text-5xl">$0</span>
+              <span className="text-sm text-muted-foreground">no card required</span>
+            </div>
+            <ul className="mt-6 space-y-3 border-t border-border pt-6 text-sm text-muted-foreground">
+              {FREE_TIER_HIGHLIGHTS.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground/90">
+                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-border text-foreground">
+                    <Check className="size-3" aria-hidden="true" />
+                  </span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-7 flex flex-wrap gap-2.5">
+            <Button asChild variant="outline" size="sm" className="min-h-10 whitespace-nowrap">
+              <Link to="/training">Browse Exercises</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="min-h-10 whitespace-nowrap">
+              <Link to="/articles">Read Latest Science</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="min-h-10 whitespace-nowrap">
+              <Link to="/nutrition">Explore Nutrition</Link>
+            </Button>
+          </div>
+        </article>
+
+        <article className="flex flex-col justify-between rounded-2xl border border-brand-amber/45 bg-surface p-7">
+          <div>
+            <p className="eyebrow text-brand-amber">Pro / Paid Capabilities (Preview / Demo)</p>
+            <h2 className="text-display mt-3 text-2xl text-foreground sm:text-3xl">
+              Built for ongoing coaching &amp; tracking
+            </h2>
+            <ul className="mt-6 space-y-3 border-t border-border pt-6 text-sm text-muted-foreground">
+              {PRO_TIER_EXTRA_HIGHLIGHTS.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-foreground/90">
+                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-brand-amber/50 text-brand-amber">
+                    <Check className="size-3" aria-hidden="true" />
+                  </span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-7 flex flex-wrap gap-2.5">
+            <Button asChild variant="hero" size="sm" className="min-h-10 gap-1.5 whitespace-nowrap">
+              <Link to="/submit">
+                Test Flag for Deeper Review <ArrowRight className="size-3.5" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild variant="glass" size="sm" className="min-h-10 whitespace-nowrap">
+              <Link to="/training">Test Workout Prescriptions</Link>
+            </Button>
+          </div>
+        </article>
+      </section>
 
       {externalUrl && (
         <div className="mt-8 flex flex-col items-start justify-between gap-4 rounded-2xl border border-brand-amber/50 bg-surface p-6 sm:flex-row sm:items-center">
@@ -234,7 +384,7 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
               <ShieldCheck className="size-3.5" aria-hidden="true" /> Active ·{" "}
               {activeTier?.name ?? activePlan}
             </p>
-            <p className="text-display text-3xl">Your Dusk Kinetic membership is active.</p>
+            <p className="text-display text-3xl">Your Auctus Performance membership is active.</p>
             <p className="text-sm text-muted-foreground">
               {billingQuery.data?.currentPeriodEnd
                 ? `${billingQuery.data.cancelAtPeriodEnd ? "Access ends" : "Renews"} on ${formatDate(billingQuery.data.currentPeriodEnd)}`
@@ -260,9 +410,10 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
         </div>
       )}
 
-      <div
+      <section
+        id="plans-tiers"
         className={cn(
-          "mt-12 grid gap-6",
+          "mt-12 scroll-mt-24 grid gap-6",
           visiblePlans.length === 1
             ? "max-w-xl"
             : visiblePlans.length === 3
@@ -282,7 +433,9 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
             >
               <div>
                 <div className="flex items-center justify-between gap-3">
-                  <p className="eyebrow">{plan.tierLabel}</p>
+                  <p className="eyebrow">
+                    {configured ? plan.tierLabel : `${plan.tierLabel} · Preview`}
+                  </p>
                   {plan.badge && (
                     <span
                       className={cn(
@@ -352,12 +505,16 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
                     variant={plan.highlighted ? "hero" : "glass"}
                     size="xl"
                     className="w-full"
-                    disabled={busyPlan !== null || (!configured && Boolean(session))}
-                    onClick={() => handleSubscribe(plan.id)}
+                    disabled={busyPlan !== null}
+                    onClick={() => handleSubscribe(plan.id, plan.name)}
                   >
                     {busyPlan === plan.id ? (
                       <>
                         <Loader2 className="animate-spin" /> Connecting to Stripe…
+                      </>
+                    ) : !configured ? (
+                      <>
+                        Try {plan.name} Preview <ArrowRight />
                       </>
                     ) : !session ? (
                       <>
@@ -374,7 +531,7 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
             </article>
           );
         })}
-      </div>
+      </section>
 
       {!session && (
         <p className="mt-8 text-center text-sm text-muted-foreground">
@@ -388,9 +545,9 @@ export function PricingPlans({ sessionId, canceled, returnPath = "/pricing" }: P
         </p>
       )}
 
-      <div className="mt-20">
-        <FaqSection />
+      <div className="mt-16">
+        <FaqSection id="plans-faq" />
       </div>
-    </div>
+    </PageWithOutline>
   );
 }

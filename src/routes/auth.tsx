@@ -32,6 +32,7 @@ import {
   GOOGLE_OAUTH_PROVIDER,
   LOVABLE_GOOGLE_PROVIDER,
 } from "@/lib/auth-providers";
+import { AthleticImage } from "@/components/site/athletic-image";
 import { AGE_GROUPS, EXPERIENCE_LEVELS, SPORTS } from "@/lib/sports";
 import { SITE_MEDIA } from "@/lib/media";
 
@@ -51,17 +52,17 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in or Join — Dusk Kinetic Performance" },
+      { title: "Sign in or Join — Auctus Performance" },
       {
         name: "description",
         content:
-          "Sign in to Dusk Kinetic Performance or create an athlete account to access training, nutrition, and video review.",
+          "Sign in to Auctus Performance or create an athlete account to access training, nutrition, and video review.",
       },
-      { property: "og:title", content: "Sign in or Join — Dusk Kinetic Performance" },
+      { property: "og:title", content: "Sign in or Join — Auctus Performance" },
       {
         property: "og:description",
         content:
-          "Access your Dusk Kinetic training library, nutrition protocols, and video review.",
+          "Access your Auctus Performance training library, nutrition protocols, and video review.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -359,7 +360,7 @@ function AuthPage() {
               sport: parsed.data.sport,
               level: parsed.data.level,
             });
-            toast.success("Account created — welcome to Dusk Kinetic.");
+            toast.success("Account created — welcome to Auctus Performance.");
             navigate({ to: "/dashboard", replace: true });
             return;
           }
@@ -515,7 +516,7 @@ function AuthPage() {
         toast.error(error.message);
         return;
       }
-      toast.success("Email verified — welcome to Dusk Kinetic.");
+      toast.success("Email verified — welcome to Auctus Performance.");
       navigate({ to: "/dashboard", replace: true });
     } catch {
       setOtpError("Verification request failed. Please try again.");
@@ -653,7 +654,7 @@ function AuthPage() {
   const title = pendingOtpEmail
     ? "Verify your email"
     : mode === "signup"
-      ? "Join Dusk Kinetic"
+      ? "Join Auctus Performance"
       : mode === "forgot"
         ? "Reset your password"
         : "Welcome back";
@@ -661,27 +662,27 @@ function AuthPage() {
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
-        <img
+        <AthleticImage
           src={SITE_MEDIA.authCourt.src}
           alt={SITE_MEDIA.authCourt.alt}
           width={SITE_MEDIA.authCourt.width}
           height={SITE_MEDIA.authCourt.height}
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center brightness-90"
+          className="absolute inset-0 h-full w-full object-cover object-center brightness-90 saturate-[1.1]"
         />
         <div className="absolute inset-0 bg-fade-up" />
         <div className="absolute bottom-12 left-12 right-12">
           <span className="block h-[3px] w-16 bg-tricolor" aria-hidden="true" />
-          <p className="eyebrow mt-5 text-brand-amber">Dusk Kinetic Performance</p>
+          <p className="eyebrow mt-5 text-brand-amber">Auctus Performance</p>
           <p className="text-display mt-3 text-5xl xl:text-6xl">
             Every rep counts.
             <br />
-            Finish stronger at dusk.
+            Finish stronger.
           </p>
         </div>
       </div>
 
-      <div className="flex items-center justify-center px-5 py-16">
+      <div className="flex items-center justify-center px-4 py-12 sm:px-5 sm:py-16">
         <div className="w-full max-w-md">
           <h1 className="text-display text-4xl sm:text-5xl">{title}</h1>
           <p className="mt-2 text-muted-foreground">
@@ -732,30 +733,30 @@ function AuthPage() {
                     <InputOTPGroup>
                       <InputOTPSlot
                         index={0}
-                        className="h-12 w-11 border-border bg-background text-base"
+                        className="h-12 w-10 border-border bg-background text-base sm:w-11"
                       />
                       <InputOTPSlot
                         index={1}
-                        className="h-12 w-11 border-border bg-background text-base"
+                        className="h-12 w-10 border-border bg-background text-base sm:w-11"
                       />
                       <InputOTPSlot
                         index={2}
-                        className="h-12 w-11 border-border bg-background text-base"
+                        className="h-12 w-10 border-border bg-background text-base sm:w-11"
                       />
                     </InputOTPGroup>
                     <InputOTPSeparator />
                     <InputOTPGroup>
                       <InputOTPSlot
                         index={3}
-                        className="h-12 w-11 border-border bg-background text-base"
+                        className="h-12 w-10 border-border bg-background text-base sm:w-11"
                       />
                       <InputOTPSlot
                         index={4}
-                        className="h-12 w-11 border-border bg-background text-base"
+                        className="h-12 w-10 border-border bg-background text-base sm:w-11"
                       />
                       <InputOTPSlot
                         index={5}
-                        className="h-12 w-11 border-border bg-background text-base"
+                        className="h-12 w-10 border-border bg-background text-base sm:w-11"
                       />
                     </InputOTPGroup>
                   </InputOTP>
@@ -814,7 +815,7 @@ function AuthPage() {
                 We sent a link to <span className="text-foreground">{checkEmail}</span>.{" "}
                 {mode === "forgot"
                   ? "Open the link in that email to set a new password."
-                  : "Confirm your email to activate your Dusk Kinetic account."}
+                  : "Confirm your email to activate your Auctus Performance account."}
               </p>
 
               {mode === "forgot" && isLocalFallback && (
@@ -957,7 +958,7 @@ function AuthPage() {
                         <button
                           type="button"
                           onClick={() => setMode("forgot")}
-                          className="text-xs text-brand-amber underline-offset-4 hover:underline"
+                          className="inline-flex min-h-11 items-center text-xs text-brand-amber underline-offset-4 hover:underline sm:min-h-0"
                         >
                           Forgot password?
                         </button>
@@ -969,6 +970,7 @@ function AuthPage() {
                       type="password"
                       autoComplete={mode === "signup" ? "new-password" : "current-password"}
                       placeholder={mode === "signup" ? "At least 8 characters" : "••••••••"}
+                      className="h-11"
                     />
                   </Field>
                 )}
@@ -1028,7 +1030,7 @@ function AuthPage() {
                   </button>
                 ) : (
                   <>
-                    New to Dusk Kinetic?{" "}
+                    New to Auctus Performance?{" "}
                     <button
                       type="button"
                       className="text-foreground underline underline-offset-4 hover:text-brand-amber"

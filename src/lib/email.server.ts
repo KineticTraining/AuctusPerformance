@@ -56,7 +56,7 @@ function getSmtpTransporter(): { transporter: Transporter; defaultFrom: string }
 
   return {
     transporter: cachedTransporter,
-    defaultFrom: readEnvFallback("EMAIL_FROM") ?? (user || "no-reply@duskkinetic.com"),
+    defaultFrom: readEnvFallback("EMAIL_FROM") ?? (user || "no-reply@auctusperformance.com"),
   };
 }
 
@@ -72,13 +72,13 @@ function buildVerificationEmailHtml(input: SendVerificationEmailInput): string {
         <td>
           <div style="width:48px;height:3px;background:linear-gradient(90deg,#f59e0b,#ea580c,#e11d48);margin-bottom:20px;"></div>
           <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#f59e0b;font-weight:600;">
-            Dusk Kinetic Performance
+            Auctus Performance
           </p>
           <h1 style="margin:0 0 12px;font-size:24px;font-weight:600;color:#ffffff;">
             Confirm your email address
           </h1>
           <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#b4b8c5;">
-            Hi ${safeName}, enter the 6-digit confirmation code below to verify your email and activate your Dusk Kinetic Performance account.
+            Hi ${safeName}, enter the 6-digit confirmation code below to verify your email and activate your Auctus Performance account.
           </p>
           <div style="background:#0a0b0f;border:1px solid #2e3242;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px;">
             <span style="font-family:'SFMono-Regular',Consolas,monospace;font-size:32px;font-weight:700;letter-spacing:0.3em;color:#f59e0b;">
@@ -97,7 +97,7 @@ function buildVerificationEmailHtml(input: SendVerificationEmailInput): string {
 
 function buildVerificationEmailText(input: SendVerificationEmailInput): string {
   return [
-    `Dusk Kinetic Performance — Confirm your email`,
+    `Auctus Performance — Confirm your email`,
     ``,
     `Hi ${input.name || "Athlete"},`,
     ``,
@@ -118,13 +118,13 @@ export async function sendVerificationCodeEmail(
     );
   }
 
-  const subject = `${input.code} is your Dusk Kinetic verification code`;
+  const subject = `${input.code} is your Auctus Performance verification code`;
   const html = buildVerificationEmailHtml(input);
   const text = buildVerificationEmailText(input);
 
   if (provider === "resend") {
     const apiKey = readEnvFallback("RESEND_API_KEY")!;
-    const from = readEnvFallback("EMAIL_FROM") ?? "Dusk Kinetic <onboarding@resend.dev>";
+    const from = readEnvFallback("EMAIL_FROM") ?? "Auctus Performance <onboarding@resend.dev>";
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {

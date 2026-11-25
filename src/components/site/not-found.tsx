@@ -24,8 +24,8 @@ export function NotFoundPage() {
             </Link>
           </Button>
           <Button asChild variant="glass" size="xl" className="min-h-12">
-            <Link to="/dashboard">
-              <PlayCircle className="size-4" aria-hidden="true" /> Training Library
+            <Link to="/training">
+              <PlayCircle className="size-4" aria-hidden="true" /> Training &amp; Workout Builder
             </Link>
           </Button>
         </div>

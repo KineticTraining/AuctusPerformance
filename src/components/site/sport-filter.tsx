@@ -42,7 +42,7 @@ export function SportFilter({
               aria-pressed={active}
               onClick={() => toggle(sport)}
               className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-normal whitespace-nowrap transition-colors sm:min-h-9 sm:py-1.5",
+                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-normal whitespace-nowrap transition-colors",
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : atLimit
@@ -69,7 +69,7 @@ export function SportFilter({
           <button
             type="button"
             onClick={() => onChange([])}
-            className="px-2 py-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="inline-flex min-h-11 items-center px-3 py-2 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             Clear
           </button>

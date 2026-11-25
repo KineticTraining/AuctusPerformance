@@ -21,11 +21,11 @@ const buttonVariants = cva(
           "border border-foreground/25 bg-background/20 text-foreground backdrop-blur-md hover:border-foreground/60 hover:bg-background/40",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        xl: "h-12 rounded-md px-7 text-sm",
-        icon: "h-9 w-9",
+        default: "min-h-11 sm:min-h-9 h-auto px-4 py-2",
+        sm: "min-h-11 sm:min-h-8 h-auto rounded-md px-3 text-xs",
+        lg: "min-h-11 sm:min-h-10 h-auto rounded-md px-8",
+        xl: "min-h-12 h-auto rounded-md px-7 py-3 text-sm",
+        icon: "size-11 sm:size-9",
       },
     },
     defaultVariants: {

@@ -5,7 +5,9 @@ import { ArrowRight, Play } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { AthleticImage } from "@/components/site/athletic-image";
 import { MultiFilterBar } from "@/components/site/multi-filter-bar";
+import { PageWithOutline, type OutlineSection } from "@/components/site/page-outline";
 import { DashboardSkeleton } from "@/components/site/page-skeletons";
 import { SportFilter } from "@/components/site/sport-filter";
 import { WorkspaceTabs } from "@/components/site/workspace-tabs";
@@ -14,7 +16,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { getBillingStatus } from "@/lib/billing.functions";
-import { getVideoThumbnail, SITE_MEDIA } from "@/lib/media";
+import { getVideoThumbnail } from "@/lib/media";
 import { SEED_VIDEOS, type VideoSeedRow } from "@/lib/mock-seed";
 import { getTierById } from "@/lib/plans";
 import { matchesAgeFilter, matchesExperienceFilter } from "@/lib/sports";
@@ -26,7 +28,7 @@ const dashboardQuery = () =>
   queryOptions({
     queryKey: ["dashboard"],
     queryFn: async () => {
-      const [{ data: auth }, videos, subs] = await Promise.all([
+      const [{ data: auth }, videos, videoApi] = await Promise.all([
         supabase.auth.getUser(),
         supabase
           .from("videos")
@@ -34,12 +36,32 @@ const dashboardQuery = () =>
             "id, created_at, section, title, description, sport, sports, level, duration_label, youtube_id, coach, sort_order",
           )
           .order("section")
-          .order("sort_order"),
-        supabase
-          .from("submissions")
-          .select("id, title, status, created_at")
-          .order("created_at", { ascending: false })
-          .limit(5),
+          .order("sort_order")
+          .then(
+            (r) => r,
+            () => ({ data: null }),
+          ),
+        supabase.auth.getSession().then(async ({ data: sessionRes }) => {
+          const token = sessionRes.session?.access_token;
+          if (!token) return [];
+          try {
+            const res = await fetch("/api/video/submissions", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) return [];
+            const payload = (await res.json()) as {
+              submissions?: Array<{
+                id: string;
+                title: string;
+                status: string;
+                created_at: string;
+              }>;
+            };
+            return payload.submissions ?? [];
+          } catch {
+            return [];
+          }
+        }),
       ]);
       const userId = auth.user?.id ?? "";
       const { data: profile } = userId
@@ -48,6 +70,10 @@ const dashboardQuery = () =>
             .select("display_name, sport, level")
             .eq("id", userId)
             .maybeSingle()
+            .then(
+              (r) => r,
+              () => ({ data: null }),
+            )
         : { data: null };
 
       const rawVideos = videos.data && videos.data.length > 0 ? videos.data : SEED_VIDEOS;
@@ -73,22 +99,22 @@ const dashboardQuery = () =>
         level: meta["level"] ?? "",
       };
 
-      return { profile: resolvedProfile, videos: enrichedVideos, submissions: subs.data ?? [] };
+      return { profile: resolvedProfile, videos: enrichedVideos, submissions: videoApi };
     },
   });
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Training Library — Dusk Kinetic Performance" },
+      { title: "Training Library — Auctus Performance" },
       {
         name: "description",
-        content: "Your Dusk Kinetic Performance training dashboard and video library.",
+        content: "Your Auctus Performance training dashboard and video library.",
       },
-      { property: "og:title", content: "Training Library — Dusk Kinetic Performance" },
+      { property: "og:title", content: "Training Library — Auctus Performance" },
       {
         property: "og:description",
-        content: "Your Dusk Kinetic Performance training dashboard and video library.",
+        content: "Your Auctus Performance training dashboard and video library.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -106,6 +132,12 @@ const SECTIONS = [
   "Mobility & Recovery",
   "Sport Skills",
   "Mindset",
+];
+
+const DASHBOARD_OUTLINE: OutlineSection[] = [
+  { id: "library-overview", label: "Overview" },
+  { id: "library-filters", label: "Filters" },
+  { id: "library-videos", label: "Training Videos" },
 ];
 
 function Dashboard() {
@@ -205,10 +237,13 @@ function Dashboard() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-14">
+    <PageWithOutline sections={DASHBOARD_OUTLINE} title="Video Library">
       <WorkspaceTabs active="library" />
 
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div
+        id="library-overview"
+        className="scroll-mt-24 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+      >
         <div>
           <p className="eyebrow text-brand-amber">
             {[
@@ -219,7 +254,7 @@ function Dashboard() {
               .filter(Boolean)
               .join(" · ") || "Training Library"}
           </p>
-          <h1 className="text-display mt-3 text-4xl sm:text-5xl md:text-6xl">
+          <h1 className="text-display mt-3 text-3xl sm:text-5xl md:text-6xl">
             Let&apos;s work, {name}.
           </h1>
           <p className="mt-2 font-mono text-xs text-muted-foreground tabular-nums">
@@ -227,17 +262,17 @@ function Dashboard() {
             {reviewsReadyCount} AI reviews ready
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           {billingQuery.isLoading ? (
-            <Skeleton className="h-11 w-36" />
+            <Skeleton className="h-11 w-full sm:w-36" />
           ) : (
-            <Button asChild variant="glass" size="lg" className="min-h-11">
+            <Button asChild variant="glass" size="lg" className="min-h-11 w-full sm:w-auto">
               <Link to="/pricing">
                 {activeTier ? `${activeTier.name} plan` : "Plans & pricing"}
               </Link>
             </Button>
           )}
-          <Button asChild variant="hero" size="lg" className="min-h-11">
+          <Button asChild variant="hero" size="lg" className="min-h-11 w-full sm:w-auto">
             <Link to="/submit">
               Open AI Video Analysis <ArrowRight aria-hidden="true" />
             </Link>
@@ -245,25 +280,25 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-10 flex flex-wrap gap-2">
-        {SECTIONS.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setSection(s)}
-            className={cn(
-              "min-h-10 rounded-full border px-4 py-1.5 text-sm font-normal whitespace-nowrap transition-colors",
-              section === s
-                ? "border-brand-amber bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      <section id="library-filters" className="mt-8 scroll-mt-24 space-y-5 sm:mt-10">
+        <div className="flex flex-wrap gap-2">
+          {SECTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setSection(s)}
+              className={cn(
+                "min-h-11 rounded-full border px-4 py-2 text-sm font-normal whitespace-nowrap transition-colors",
+                section === s
+                  ? "border-brand-amber bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
 
-      <div className="mt-6 space-y-5">
         <MultiFilterBar
           ageGroup={ageGroup}
           onAgeGroupChange={setAgeGroup}
@@ -288,7 +323,7 @@ function Dashboard() {
             )
           }
         />
-      </div>
+      </section>
 
       {videos.length === 0 && (
         <div className="mt-10 rounded-2xl border border-border bg-surface p-8 text-center">
@@ -307,7 +342,10 @@ function Dashboard() {
         </div>
       )}
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        id="library-videos"
+        className="mt-8 scroll-mt-24 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+      >
         {visibleVideos.map((v) => {
           const thumb = getVideoThumbnail({
             youtubeId: v.youtube_id,
@@ -325,19 +363,13 @@ function Dashboard() {
               className="group overflow-hidden rounded-2xl border border-border bg-surface text-left transition-colors hover:border-brand-amber/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="relative aspect-video overflow-hidden bg-background">
-                <img
+                <AthleticImage
                   src={thumb.src}
                   alt={thumb.alt}
                   width={1280}
                   height={720}
                   loading="lazy"
                   decoding="async"
-                  onError={(e) => {
-                    const el = e.currentTarget;
-                    if (el.dataset["fallbackApplied"]) return;
-                    el.dataset["fallbackApplied"] = "1";
-                    el.src = SITE_MEDIA.trainingGym.src;
-                  }}
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <span className="absolute inset-0 grid place-items-center bg-background/35 transition-colors group-hover:bg-background/20">
@@ -398,6 +430,6 @@ function Dashboard() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageWithOutline>
   );
 }

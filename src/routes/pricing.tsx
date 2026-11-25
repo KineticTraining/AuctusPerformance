@@ -13,13 +13,13 @@ export const Route = createFileRoute("/pricing")({
   }),
   head: () => ({
     meta: [
-      { title: "Pricing — Kinetic" },
+      { title: "Pricing — Auctus Performance" },
       {
         name: "description",
         content:
-          "Compare Kinetic monthly and annual plans for training videos, sport filters, and AI technique reviews.",
+          "Compare Auctus Performance monthly and annual plans for training videos, sport filters, and AI technique reviews.",
       },
-      { property: "og:title", content: "Pricing — Kinetic" },
+      { property: "og:title", content: "Pricing — Auctus Performance" },
       {
         property: "og:description",
         content: "Monthly and annual sports training membership tiers powered by Stripe.",

@@ -240,7 +240,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Dusk Kinetic · ${tier.name}`,
+              name: `Auctus Performance · ${tier.name}`,
               description: tier.features.slice(0, 2).join(" · "),
             },
             unit_amount: tier.amountCents,

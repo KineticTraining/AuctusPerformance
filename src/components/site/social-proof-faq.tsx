@@ -14,49 +14,37 @@ interface FaqItem {
 const FAQS: FaqItem[] = [
   {
     id: "time-commitment",
-    question: "How much time do I need each week?",
+    question: "How much weekly time is needed?",
     answer:
-      "Most athletes train effectively with 3 to 4 focused sessions per week, averaging 35 to 50 minutes total. Warm-ups and mobility blocks run 6 to 12 minutes, and you can pair a strength or skill clip directly with your court, field, or gym practice.",
+      "3 to 4 sessions per week (35–50 minutes each). Warm-ups take 6–12 minutes alongside court, field, or gym practice.",
   },
   {
     id: "equipment-needed",
-    question: "What equipment is required for the drills and programs?",
+    question: "What equipment do I need?",
     answer:
-      "No specialty facility is required. Sport skills, acceleration progressions, agility footwork, and hip mobility routines need flat turf, court space, or a living-room mat plus a phone to film reps. Strength & Power progressions scale cleanly whether you have a barbell rack, dumbbells, or bodyweight options.",
+      "Filter the library for Barbells, Dumbbells, Machines, or Bodyweight. Sport and mobility drills work anywhere.",
   },
   {
     id: "video-feedback",
-    question: "How does AI video upload and technique analysis work?",
+    question: "How does AI Video Analysis work?",
     answer:
-      "Open the dedicated AI Video tab to upload a training clip from your device or paste a YouTube link, select the target technique (such as Jump Shot, Sprint Acceleration, Back Squat, or Tennis Serve), and add brief notes on what you felt. Dusk Kinetic evaluates your submission against our coaching cue and fault framework to return strengths, corrections, and specific drills.",
+      "Upload an MP4/MOV/WebM clip or YouTube link and add notes. You get mechanical strengths, form fixes, and corrective drills.",
   },
   {
     id: "plans-limits",
-    question: "How do the Basic, Pro, Unlimited, and Annual tiers differ?",
+    question: "What is Free vs. Pro?",
     answer:
-      "Basic ($45/mo) unlocks 2 sport filters with beginner and select intermediate videos plus up to 20 video reviews each month. Pro ($70/mo) expands to 5 sport filters, all drill levels, and 40 monthly reviews. Unlimited Monthly ($100/mo) and Annual ($1,000/yr) include every sport filter, the entire library, and unlimited reviews.",
-  },
-  {
-    id: "cancellation",
-    question: "Can I switch plans or cancel anytime?",
-    answer:
-      "Yes. All subscriptions are managed directly through the Stripe Billing Portal on your Membership page. You can upgrade, switch between monthly and annual billing, update cards, or cancel at any point.",
+      "The 400+ exercise library, Latest Science, Nutrition reference, and sample demos are free. Pro adds workout saving, private notes, flagging, and higher video limits.",
   },
 ];
 
-export function FaqSection() {
+export function FaqSection({ id = "faq" }: { id?: string }) {
   return (
-    <section className="border-t border-border/60 bg-surface/40">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 md:grid-cols-[1fr_1.4fr] md:px-8 md:py-24">
+    <section id={id} className="scroll-mt-24 rounded-2xl border border-border/60 bg-surface/40">
+      <div className="grid gap-10 px-5 py-12 md:grid-cols-[0.9fr_1.5fr] md:px-8 md:py-16">
         <div>
-          <p className="eyebrow text-brand-amber">Frequently Asked Questions</p>
-          <h2 className="text-display mt-4 text-4xl md:text-5xl">
-            Clear answers before you start.
-          </h2>
-          <p className="mt-4 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
-            Practical details on weekly training volume, home or gym equipment, and how our AI video
-            analysis works.
-          </p>
+          <p className="eyebrow text-brand-amber">FAQ</p>
+          <h2 className="text-display mt-3 text-3xl sm:text-4xl">Quick answers.</h2>
         </div>
 
         <Accordion
@@ -66,7 +54,7 @@ export function FaqSection() {
         >
           {FAQS.map((faq) => (
             <AccordionItem key={faq.id} value={faq.id} className="border-border/80 last:border-b-0">
-              <AccordionTrigger className="min-h-14 py-5 text-left text-base font-normal text-foreground hover:text-brand-amber hover:no-underline">
+              <AccordionTrigger className="min-h-14 py-4 text-left text-base font-normal text-foreground hover:text-brand-amber hover:no-underline">
                 {faq.question}
               </AccordionTrigger>
               <AccordionContent className="text-sm font-light leading-relaxed text-muted-foreground">

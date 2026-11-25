@@ -42,11 +42,7 @@ export const articleUpsertSchema = z.object({
   age_groups: z.array(z.enum(AGE_GROUPS)).min(1),
   experience_levels: z.array(z.enum(EXPERIENCE_LEVELS)).min(1),
   sources: z.array(sourceItemSchema).max(12),
-  data_conclusion: z
-    .string()
-    .trim()
-    .min(10, "Enter your Coach's Conclusion / Data Takeaway")
-    .max(1200),
+  data_conclusion: z.string().trim().min(10, "Enter a practical data takeaway").max(1200),
 });
 
 export const newsletterUpsertSchema = z.object({
@@ -84,7 +80,7 @@ export const nutritionUpsertSchema = z.object({
     biochemicalFunction: z.string().trim().min(15).max(5000),
     whereLocatedInFood: z.string().trim().min(10).max(2000),
   }),
-  ageGroups: z.array(z.enum(AGE_GROUPS)).min(1),
+  ageGroups: z.array(z.enum(AGE_GROUPS)).optional(),
 });
 
 export const getAdminConfigStatus = createServerFn({ method: "GET" }).handler(
@@ -285,7 +281,8 @@ export const upsertCmsNutrition = createServerFn({ method: "POST" })
       performanceOneLiner: data.performanceOneLiner,
       summarized: { ...data.summarized },
       inDepth: { ...data.inDepth },
-      ageGroups: [...data.ageGroups],
+      ageGroups:
+        data.ageGroups && data.ageGroups.length > 0 ? [...data.ageGroups] : [...AGE_GROUPS],
       ...(existing?.ageGuidance ? { ageGuidance: existing.ageGuidance } : {}),
       updated_at: new Date().toISOString().slice(0, 10),
     };
